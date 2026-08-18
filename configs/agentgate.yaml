@@ -1,0 +1,61 @@
+# AgentGate — MCP security firewall config
+#
+# Run: ./agentgate -config configs/agentgate.yaml
+# The gate speaks MCP over its own stdin/stdout to your agent, and spawns the
+# real tool server below as a child process.
+
+tool_server:
+  command: npx
+  args:
+    - -y
+    - "@modelcontextprotocol/server-filesystem"
+    - /tmp
+
+# Where every request/response/block is recorded (JSONL, secrets redacted).
+audit_log: agentgate-audit.jsonl
+
+# Per-request timeout when talking to the tool server.
+timeout: 2m
+
+policy:
+  # Deny-by-default: nothing runs unless explicitly allowed.
+  tool_rules:
+    - apply_to: "*"
+      deny: true
+      reason: "deny all tools by default"
+    - apply_to: read_file
+      allow: true
+    - apply_to: list_directory
+      allow: true
+    - apply_to: search_files
+      allow: true
+    - apply_to: shell
+      allow: true
+      arg_deny_pattern: "(rm -rf|del /s|shutdown|format |:(){:|:&};:)"
+      reason: "dangerous shell commands blocked"
+    - apply_to: write_file
+      deny: true
+      reason: "read-only filesystem mode"
+
+  # Scrub secrets from arguments and responses before the agent or the log
+  # sees them. Key-restricted rules apply within that key's subtree.
+  redact:
+    - keys: ["api_key", "password", "token", "secret", "authorization"]
+      pattern: ".*"
+      replacement: "***"
+    - pattern: "sk-[A-Za-z0-9]{20,}"
+      replacement: "***"
+    - pattern: "Bearer\\s+[A-Za-z0-9._-]{10,}"
+      replacement: "Bearer ***"
+
+  # Burst limits per tool.
+  rate_limits:
+    - apply_to: shell
+      burst: 5
+      window: 1m
+    - apply_to: "*"
+      burst: 60
+      window: 1m
+
+  # Reject tool calls with oversized argument payloads.
+  max_arg_bytes: 65536

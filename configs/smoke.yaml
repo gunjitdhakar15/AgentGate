@@ -1,0 +1,25 @@
+# Smoke-test config for AgentGate wrapping the mock tool server.
+tool_server:
+  command: ./mock-tools.exe
+audit_log: smoke-audit.jsonl
+policy:
+  tool_rules:
+    - apply_to: "*"
+      deny: true
+      reason: "deny all tools by default"
+    - apply_to: read_file
+      allow: true
+    - apply_to: shell
+      allow: true
+      arg_deny_pattern: "(rm -rf|del /s)"
+      reason: "destructive shell commands blocked"
+  redact:
+    - keys: ["api_key", "password"]
+      pattern: ".*"
+      replacement: "***"
+    - pattern: "sk-[A-Za-z0-9]{20,}"
+      replacement: "***"
+  rate_limits:
+    - apply_to: "*"
+      burst: 10
+      window: 1m

@@ -1,0 +1,18 @@
+# Binaries
+agentgate
+agentgate.exe
+mock-tools
+mock-tools.exe
+*.exe
+
+# Audit logs (runtime artifacts)
+*.jsonl
+audit/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
