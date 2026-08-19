@@ -11,7 +11,7 @@ policy:
       allow: true
     - apply_to: shell
       allow: true
-      arg_deny_pattern: "(rm -rf|del /s)"
+      arg_deny_pattern: "(rm -rf|del /s|format |shutdown)"
       reason: "destructive shell commands blocked"
   redact:
     - keys: ["api_key", "password"]
