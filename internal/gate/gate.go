@@ -21,6 +21,8 @@ type Gate struct {
 	Audit  *audit.Store
 	// Timeout per forwarded request; 0 uses the default of 10 minutes.
 	Timeout time.Duration
+	// Sink, when set, receives every audit entry in addition to the store.
+	Sink func(audit.Entry)
 
 	log     *log.Logger
 	buckets []*bucketRule
@@ -109,10 +111,15 @@ func (g *Gate) handleRequest(ctx context.Context, req *mcp.Request, raw []byte, 
 
 	// Rate limiting.
 	if !g.rateAllowed(call.Name) {
+		g.audit(audit.Entry{
+			TS: time.Now(), Kind: "blocked", RequestID: req.IDString(),
+			Method: req.Method, Tool: call.Name, Decision: "rate limit exceeded",
+		})
 		return g.respondBlocked(agent, req.ID, call.Name, "rate limit exceeded")
 	}
 
 	// Policy decision + redaction.
+	rawArgs := mustJSON(call.Arguments)
 	dec, redacted := g.Policy.Check(call.Name, call.Arguments)
 	if !dec.Allowed {
 		g.log.Printf("blocked tool=%q reason=%q rule=%q", call.Name, dec.Reason, dec.Rule)
@@ -122,6 +129,15 @@ func (g *Gate) handleRequest(ctx context.Context, req *mcp.Request, raw []byte, 
 			Args: mustJSON(redacted),
 		})
 		return g.respondBlocked(agent, req.ID, call.Name, dec.Reason)
+	}
+
+	redactedArgs := mustJSON(redacted)
+	if string(redactedArgs) != string(rawArgs) {
+		g.audit(audit.Entry{
+			TS: time.Now(), Kind: "redacted", RequestID: req.IDString(),
+			Method: req.Method, Tool: call.Name, Decision: "arguments",
+			Args: redactedArgs,
+		})
 	}
 
 	// Forward the sanitized call.
@@ -142,7 +158,15 @@ func (g *Gate) handleRequest(ctx context.Context, req *mcp.Request, raw []byte, 
 
 	// Redact the response payload before it reaches the agent or the log.
 	if len(resp.Result) > 0 {
-		resp.Result = g.RedactPayload(resp.Result)
+		redactedResult := g.RedactPayload(resp.Result)
+		if string(redactedResult) != string(resp.Result) {
+			g.audit(audit.Entry{
+				TS: time.Now(), Kind: "redacted", RequestID: req.IDString(),
+				Method: req.Method, Tool: call.Name, Decision: "response",
+				Result: redactedResult,
+			})
+		}
+		resp.Result = redactedResult
 	}
 	g.audit(audit.Entry{
 		TS: time.Now(), Kind: "response", RequestID: req.IDString(),
@@ -244,6 +268,9 @@ func (g *Gate) respondErr(agent *mcp.Stream, id json.RawMessage, code int, msg s
 func (g *Gate) audit(e audit.Entry) {
 	if g.Audit != nil {
 		_ = g.Audit.Log(e)
+	}
+	if g.Sink != nil {
+		g.Sink(e)
 	}
 }
 

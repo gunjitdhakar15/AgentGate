@@ -216,6 +216,51 @@ func TestE2ERateLimitBlocks(t *testing.T) {
 	}
 }
 
+func TestE2ESinkReceivesEvents(t *testing.T) {
+	cp := policyFromRules([]ToolRule{
+		{ApplyTo: "*", Deny: true},
+		{ApplyTo: "read_file", Allow: true},
+	}, []RedactRule{
+		{Keys: []string{"api_key"}, Pattern: ".*", Replacement: "***"},
+	}, nil)
+
+	g, w, r, _ := testGate(t, cp)
+	var got []audit.Entry
+	g.Sink = func(e audit.Entry) { got = append(got, e) }
+
+	e2eRun(t, w, r, "tools/call", map[string]any{
+		"name": "shell", "arguments": map[string]any{"cmd": "ls"},
+	})
+	e2eRun(t, w, r, "tools/call", map[string]any{
+		"name":      "read_file",
+		"arguments": map[string]any{"path": "/etc/hosts", "api_key": "sk-hunter2"},
+	})
+
+	// The gate's deferred audit fires after the reply is written, so wait
+	// for the sink to catch up instead of racing it.
+	deadline := time.Now().Add(3 * time.Second)
+	for len(got) < 5 && time.Now().Before(deadline) {
+		time.Sleep(10 * time.Millisecond)
+	}
+
+	kinds := map[string]int{}
+	for _, e := range got {
+		kinds[e.Kind]++
+	}
+	if kinds["request"] < 2 {
+		t.Errorf("sink: request entries = %d, want >= 2", kinds["request"])
+	}
+	if kinds["blocked"] != 1 {
+		t.Errorf("sink: blocked entries = %d, want 1", kinds["blocked"])
+	}
+	if kinds["response"] != 1 {
+		t.Errorf("sink: response entries = %d, want 1", kinds["response"])
+	}
+	if kinds["redacted"] == 0 {
+		t.Error("sink: expected redacted entries for args or response")
+	}
+}
+
 func contains(s, sub string) bool {
 	return len(s) >= len(sub) && indexOf(s, sub) >= 0
 }

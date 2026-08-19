@@ -90,17 +90,40 @@ policy:
 
 ```bash
 agentgate -config gate.yaml          # run the firewall
+agentgate -config gate.yaml -serve :8700   # run the firewall + live dashboard
+agentgate -serve :8700 -audit gate.jsonl   # dashboard-only: tail an existing audit log
 agentgate -check-config              # validate policy, then exit
 agentgate -audit /tmp/gate.log       # override audit path
+```
+
+## Live dashboard
+
+Open `http://localhost:8700` in a browser while the gate runs and watch every
+policy decision in real time:
+
+- **live counters** — requests, allowed, blocked, secrets redacted, protocol errors;
+- **allow/block donut** and **per-tool bars**;
+- **audit feed** streamed over SSE, with the reason every call was blocked and
+  redacted payloads (no secrets, ever).
+
+Attach the dashboard to a running gate in two ways:
+
+```bash
+# 1. Same process: gate + dashboard together
+./agentgate -config configs/agentgate.yaml -serve :8700
+
+# 2. Separately: watch the audit log of an already-running gate
+./agentgate -serve :8700 -audit agentgate-audit.jsonl
 ```
 
 ## Layout
 
 ```
-cmd/agentgate/     CLI entrypoint + config loading
+cmd/agentgate/     CLI entrypoint + config loading + live dashboard server
 internal/mcp/      JSON-RPC 2.0 framing, stdio transport
 internal/gate/     policy engine, redaction, rate limiting, proxy core
 internal/audit/    JSONL audit store with replay
+internal/web/      live dashboard (SSE + embedded UI)
 configs/           example policies
 ```
 
