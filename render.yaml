@@ -1,0 +1,11 @@
+# Render Blueprint: deploy the live AgentGate demo dashboard on the free tier.
+# Create it from the Render dashboard: New + -> Blueprint -> select this repo.
+services:
+  - type: web
+    name: agentgate-demo
+    runtime: go
+    repo: https://github.com/gunjitdhakar15/AgentGate
+    plan: free
+    buildCommand: go build -o agentgate ./cmd/agentgate
+    startCommand: ./agentgate -serve :$PORT -demo
+    autoDeploy: true

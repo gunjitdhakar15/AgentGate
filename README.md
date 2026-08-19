@@ -86,12 +86,34 @@ policy:
   max_arg_bytes: 65536
 ```
 
+## Live demo
+
+One command runs the firewall, the dashboard, and streams a scripted agent
+session (allowed calls, dangerous calls, secret-laden calls) into it:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\demo.ps1
+```
+
+Then open `http://localhost:8700`. Add `-Duration 15` to stop automatically
+(handy for screen recordings).
+
+The same dashboard can be deployed on Render's free tier as an always-on
+demo that generates its own traffic:
+
+```bash
+./agentgate -serve :$PORT -demo
+```
+
+`render.yaml` at the repo root deploys it via **New + -> Blueprint**.
+
 ## CLI
 
 ```bash
 agentgate -config gate.yaml          # run the firewall
 agentgate -config gate.yaml -serve :8700   # run the firewall + live dashboard
 agentgate -serve :8700 -audit gate.jsonl   # dashboard-only: tail an existing audit log
+agentgate -serve :8700 -demo               # dashboard-only: self-generated demo traffic
 agentgate -check-config              # validate policy, then exit
 agentgate -audit /tmp/gate.log       # override audit path
 ```
