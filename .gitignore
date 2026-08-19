@@ -1,8 +1,8 @@
-# Binaries
-agentgate
-agentgate.exe
-mock-tools
-mock-tools.exe
+# Binaries (root only; cmd/ holds source)
+/agentgate
+/agentgate.exe
+/mock-tools
+/mock-tools.exe
 *.exe
 
 # Audit logs (runtime artifacts)
