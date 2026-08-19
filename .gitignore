@@ -5,9 +5,9 @@
 /mock-tools.exe
 *.exe
 
-# Audit logs (runtime artifacts)
+# Audit logs (runtime artifacts; internal/audit is source and stays tracked)
 *.jsonl
-audit/
+/audit/
 
 # IDE
 .idea/
