@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgentGate — The Firewall for AI Agents</title>
+<meta name="description" content="AgentGate is an open-source security firewall for AI agents: policy enforcement, secret redaction, rate limiting, audit logging, and a live dashboard. Written in Go.">
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #121a22;
+    --line: #1f2a37;
+    --text: #e6edf3;
+    --muted: #8b98a5;
+    --green: #34d399;
+    --red: #f87171;
+    --amber: #fbbf24;
+    --blue: #38bdf8;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(11,15,20,.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 24px; max-width: 1100px; margin: 0 auto;
+  }
+  nav .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; }
+  nav .links { margin-left: auto; display: flex; gap: 18px; align-items: center; }
+  nav .links a { color: var(--muted); font-size: 13px; }
+  nav .links a:hover { color: var(--text); }
+  .btn {
+    display: inline-block; border-radius: 8px; padding: 9px 18px;
+    font-weight: 600; font-size: 14px; border: 1px solid transparent; cursor: pointer;
+  }
+  .btn-primary { background: var(--blue); color: #08131d; }
+  .btn-primary:hover { background: #63cdfa; text-decoration: none; }
+  .btn-ghost { border-color: var(--line); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--muted); text-decoration: none; }
+
+  .hero { text-align: center; padding: 90px 24px 60px; max-width: 900px; margin: 0 auto; }
+  .hero .tagline { color: var(--blue); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700; }
+  .hero h1 { font-size: 44px; line-height: 1.15; margin: 16px 0 18px; letter-spacing: -.02em; }
+  .hero h1 em { font-style: normal; color: var(--blue); }
+  .hero p { color: var(--muted); font-size: 17px; max-width: 640px; margin: 0 auto 30px; }
+  .hero .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .hero .note { margin-top: 18px; font-size: 12px; color: var(--muted); font-family: var(--mono); }
+
+  .stats { display: flex; justify-content: center; gap: 40px; padding: 26px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .stats div { text-align: center; }
+  .stats .n { font-family: var(--mono); font-size: 26px; font-weight: 700; display: block; }
+  .stats .l { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+  .n.g { color: var(--green); } .n.r { color: var(--red); } .n.a { color: var(--amber); }
+
+  section { max-width: 1100px; margin: 0 auto; padding: 70px 24px 10px; }
+  h2 { font-size: 30px; letter-spacing: -.01em; margin-bottom: 12px; }
+  .sub { color: var(--muted); max-width: 620px; margin-bottom: 34px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
+  .card .ico { font-size: 22px; }
+  .card h3 { font-size: 16px; margin: 10px 0 6px; }
+  .card p { color: var(--muted); font-size: 13.5px; }
+
+  .diagram { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 26px; overflow-x: auto; }
+  .diagram pre { font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--text); }
+  .diagram pre span { color: var(--muted); }
+
+  pre.code {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 22px; font-family: var(--mono); font-size: 13px; line-height: 1.7;
+    overflow-x: auto; color: #d7e3ee;
+  }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 820px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .steps { counter-reset: step; display: grid; gap: 10px; }
+  .step { display: flex; gap: 14px; align-items: flex-start; }
+  .step::before {
+    counter-increment: step; content: counter(step);
+    flex: none; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--blue); color: #08131d; font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .step p { color: var(--muted); font-size: 14px; }
+  .step p code { font-family: var(--mono); font-size: 13px; color: var(--text); background: var(--panel2, #0f1620); padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line); }
+
+  footer { border-top: 1px solid var(--line); margin-top: 80px; padding: 30px 24px; text-align: center; color: var(--muted); font-size: 13px; }
+  .badges { display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+  .badges img { border-radius: 4px; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3Z" stroke="#38bdf8" stroke-width="1.6" stroke-linejoin="round"/>
+    </svg>
+    AgentGate
+  </div>
+  <div class="links">
+    <a href="/dashboard">Live dashboard</a>
+    <a href="#features">Features</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/gunjitdhakar15/AgentGate">GitHub</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="tagline">Open-source · 100% Go · MIT</div>
+  <h1>The <em>firewall</em> your AI agents need</h1>
+  <p>Agents can run shell commands, write files, and send your secrets across the internet. AgentGate sits between the agent and its tools — checking every call, masking secrets, throttling abuse, and recording everything.</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="/dashboard">See it live</a>
+    <a class="btn btn-ghost" href="#install">Download</a>
+    <a class="btn btn-ghost" href="https://github.com/gunjitdhakar15/AgentGate" target="_blank" rel="noopener">GitHub &#8599;</a>
+  </div>
+  <div class="note">One command: <code>agentgate -config gate.yaml -serve :8700</code></div>
+</div>
+
+<div class="stats">
+  <div><span class="n g">allow / deny</span><span class="l">policy engine</span></div>
+  <div><span class="n a">secrets</span><span class="l">auto-redacted</span></div>
+  <div><span class="n">token bucket</span><span class="l">rate limiting</span></div>
+  <div><span class="n r">every call</span><span class="l">audit logged</span></div>
+  <div><span class="n">SSE</span><span class="l">live dashboard</span></div>
+</div>
+
+<section id="features">
+  <h2>What the guard checks</h2>
+  <p class="sub">Four layers of protection run on every single tool call — before it ever reaches a real tool.</p>
+  <div class="cards">
+    <div class="card"><div class="ico">📜</div><h3>Policy enforcement</h3><p>Deny-by-default whitelisting, per-tool rules, and argument patterns that hard-block <code>rm -rf</code> style commands — even when the tool itself is allowed.</p></div>
+    <div class="card"><div class="ico">🕶️</div><h3>Secret redaction</h3><p>API keys, tokens, and passwords are masked to <code>***</code> in arguments and responses — including deeply nested JSON — so they never touch logs or the agent view.</p></div>
+    <div class="card"><div class="ico">⏱️</div><h3>Rate limiting</h3><p>Token-bucket limits per tool (e.g. 5 shell calls a minute) stop runaway loops and hijacked prompts from hammering your systems.</p></div>
+    <div class="card"><div class="ico">📹</div><h3>Audit logging</h3><p>Every request, response, and block lands in a replayable JSONL log with secrets already stripped. Replay any incident like a security camera.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>How it works</h2>
+  <p class="sub">A transparent man-in-the-middle: your agent talks to the real tool server, and never notices a thing.</p>
+  <div class="diagram">
+<pre>
+<span>┌──────────┐  tools/call   ┌────────────┐  tools/call   ┌──────────────┐</span>
+<span>│  Agent   │ ─────────────▶│ AgentGate  │ ─────────────▶│ Tool server  │</span>
+<span>│ (client) │ ◄───────────── │  firewall  │ ◄───────────── │  (child)     │</span>
+<span>└──────────┘    response    └────────────┘    response    └──────────────┘</span>
+<span>                            │ policy • redact • rate-limit</span>
+<span>                            ▼</span>
+<span>                         audit.jsonl (JSONL, secrets stripped)</span>
+</pre>
+  </div>
+</section>
+
+<section id="install">
+  <h2>Install in 60 seconds</h2>
+  <p class="sub">Runs anywhere — your laptop, a server, or a container. No runtime required: one binary.</p>
+  <div class="grid2">
+    <div class="card">
+      <h3>Option 1 — Download a binary</h3>
+      <p style="margin-bottom:14px">Grab the latest release for your OS:</p>
+      <div class="steps">
+        <div class="step"><p><a href="https://github.com/gunjitdhakar15/AgentGate/releases/latest/download/agentgate-windows-amd64.exe">Windows</a> · <a href="https://github.com/gunjitdhakar15/AgentGate/releases/latest/download/agentgate-linux-amd64">Linux</a> · <a href="https://github.com/gunjitdhakar15/AgentGate/releases/latest/download/agentgate-darwin-arm64">macOS (Apple Silicon)</a> · <a href="https://github.com/gunjitdhakar15/AgentGate/releases/latest/download/agentgate-darwin-amd64">macOS (Intel)</a></p></div>
+        <div class="step"><p>Rename it to <code>agentgate</code>, run <code>./agentgate -h</code> to verify.</p></div>
+        <div class="step"><p>Point your MCP client at it instead of the real tool server — nothing else changes.</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Option 2 — From source (Go)</h3>
+      <div class="step"><p>Install with Go: <code>go install github.com/gunjitdhakar15/AgentGate/cmd/agentgate@latest</code></p></div>
+      <div class="step"><p>Or build from the repo: <code>git clone</code> it and run <code>go build -o agentgate ./cmd/agentgate</code>.</p></div>
+      <div class="step"><p>Try the one-command demo: <code>powershell -ExecutionPolicy Bypass -File scripts\demo.ps1</code> (Windows) — it starts the firewall, feeds it a scripted agent session, and opens the live dashboard.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Quickstart</h2>
+  <p class="sub">Wrap any MCP stdio server — like the official filesystem server — and define your policy.</p>
+  <pre class="code"># 1. Wrap any MCP stdio tool server
+agentgate -config gate.yaml
+
+# 2. Open the live dashboard
+agentgate -config gate.yaml -serve :8700      # dashboard on http://localhost:8700
+
+# 3. Or run dashboard-only against an existing audit log
+agentgate -serve :8700 -audit gate.jsonl</pre>
+  <p class="sub" style="margin-top:26px">Example policy file:</p>
+  <pre class="code">tool_server:
+  command: npx
+  args: ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+
+policy:
+  tool_rules:
+    - apply_to: "*"            # deny everything first...
+      deny: true
+    - apply_to: read_file      # ...then whitelist what you trust
+      allow: true
+    - apply_to: shell
+      allow: true
+      arg_deny_pattern: "(rm -rf|del /s|format |shutdown)"
+  redact:
+    - keys: ["api_key", "password", "token"]
+      pattern: ".*"
+      replacement: "***"
+  rate_limits:
+    - apply_to: shell
+      burst: 5
+      window: 1m</pre>
+</section>
+
+<footer>
+  Built with Go · AgentGate — because a hijacked prompt shouldn't mean a ruined machine.
+  <div class="badges">
+    <a href="https://github.com/gunjitdhakar15/AgentGate/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.0-blue" alt="release v1.0.0"></a>
+    <img src="https://img.shields.io/badge/Go-1.26-00ADD8" alt="Go 1.26">
+    <a href="https://github.com/gunjitdhakar15/AgentGate"><img src="https://img.shields.io/badge/GitHub-repo-181717?logo=github" alt="GitHub"></a>
+  </div>
+</footer>
+</body>
+</html>

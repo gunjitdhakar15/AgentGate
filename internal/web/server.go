@@ -8,30 +8,43 @@ import (
 	"time"
 )
 
-//go:embed assets/dashboard.html
+//go:embed assets
 var assets embed.FS
 
-// Handler builds the dashboard HTTP routes: the page, a stats endpoint, and
-// the SSE event stream.
+// Handler builds the dashboard HTTP routes: the landing page, the live
+// dashboard, a stats endpoint, and the SSE event stream.
 func (d *Dashboard) Handler() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", d.handlePage)
+	mux.HandleFunc("/", d.handleLanding)
+	mux.HandleFunc("/dashboard", d.handleDashboard)
 	mux.HandleFunc("/api/stats", d.handleStats)
 	mux.HandleFunc("/events", d.handleSSE)
 	return mux
 }
 
-func (d *Dashboard) handlePage(w http.ResponseWriter, r *http.Request) {
+func (d *Dashboard) handleLanding(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
 	}
-	data, err := assets.ReadFile("assets/dashboard.html")
-	if err != nil {
-		http.Error(w, "dashboard asset missing", http.StatusInternalServerError)
+	d.serveAsset(w, "assets/landing.html", "text/html; charset=utf-8")
+}
+
+func (d *Dashboard) handleDashboard(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/dashboard" {
+		http.NotFound(w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	d.serveAsset(w, "assets/dashboard.html", "text/html; charset=utf-8")
+}
+
+func (d *Dashboard) serveAsset(w http.ResponseWriter, name, contentType string) {
+	data, err := assets.ReadFile(name)
+	if err != nil {
+		http.Error(w, "asset missing", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", contentType)
 	w.Header().Set("Cache-Control", "no-store")
 	_, _ = w.Write(data)
 }

@@ -1,5 +1,12 @@
 # AgentGate
 
+> 🚀 **See it live:** [agentgate-demo.onrender.com](https://agentgate-demo.onrender.com) — landing page + working live firewall dashboard with self-generated traffic.
+
+[![release](https://img.shields.io/badge/release-v1.0.0-blue)](https://github.com/gunjitdhakar15/AgentGate/releases/latest)
+[![Go](https://img.shields.io/badge/Go-1.26-00ADD8)](https://go.dev)
+[![tests](https://img.shields.io/badge/tests-passing-green)]()
+[![license](https://img.shields.io/badge/license-MIT-blue)]()
+
 An MCP (Model Context Protocol) **security firewall** for AI agents.
 
 `AgentGate` sits between your agent (Claude Code, Cursor, or any MCP client)
@@ -25,7 +32,26 @@ sanitized, and recorded.
 
 ## Install & run
 
+**Option 1 — download a binary** ([all releases](https://github.com/gunjitdhakar15/AgentGate/releases/latest)):
+
+| Platform | Download |
+|---|---|
+| Windows | [agentgate-windows-amd64.exe](https://github.com/gunjitdhakar15/AgentGate/releases/latest/download/agentgate-windows-amd64.exe) |
+| Linux | [agentgate-linux-amd64](https://github.com/gunjitdhakar15/AgentGate/releases/latest/download/agentgate-linux-amd64) |
+| macOS (Apple Silicon) | [agentgate-darwin-arm64](https://github.com/gunjitdhakar15/AgentGate/releases/latest/download/agentgate-darwin-arm64) |
+| macOS (Intel) | [agentgate-darwin-amd64](https://github.com/gunjitdhakar15/AgentGate/releases/latest/download/agentgate-darwin-amd64) |
+
+**Option 2 — Go (needs Go installed):**
+
 ```bash
+go install github.com/gunjitdhakar15/AgentGate/cmd/agentgate@latest
+```
+
+**Option 3 — build from source:**
+
+```bash
+git clone https://github.com/gunjitdhakar15/AgentGate
+cd AgentGate
 go build -o agentgate ./cmd/agentgate
 
 # Wrap any MCP stdio server with a policy
