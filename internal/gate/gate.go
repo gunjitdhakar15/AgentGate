@@ -10,8 +10,14 @@ import (
 	"time"
 
 	"github.com/gunjitdhakar15/AgentGate/internal/audit"
+	"github.com/gunjitdhakar15/AgentGate/internal/judge"
 	"github.com/gunjitdhakar15/AgentGate/internal/mcp"
 )
+
+// historyWindow caps how many recent tool calls are kept for the Tier 1
+// judge's session-context (escalation-pattern) awareness. Small on purpose:
+// this rides on every judged call, so it stays cheap.
+const historyWindow = 8
 
 // Gate proxies an MCP stdio session between an agent and a tool server,
 // enforcing policy on tools/call, redacting secrets from what the agent and
@@ -24,8 +30,21 @@ type Gate struct {
 	// Sink, when set, receives every audit entry in addition to the store.
 	Sink func(audit.Entry)
 
+	// Judge, when non-nil, runs Tier 1 semantic risk assessment on every
+	// call Tier 0 (Policy) allowed. Nil means Tier 0 only — this makes it
+	// possible to run the eval harness against both configurations from
+	// the same binary by simply not constructing a Judge.
+	Judge      judge.Judge
+	RouterCfg  judge.RouterConfig
+	Approver   judge.Approver
+	// TaskContext is passed to the judge as the agent's stated goal, if
+	// the operator has one to give (e.g. set from the session's initial
+	// prompt). Optional.
+	TaskContext string
+
 	log     *log.Logger
 	buckets []*bucketRule
+	history []string // rolling window of recent "tool(argsSummary)" strings, this session only
 }
 
 type bucketRule struct {
@@ -140,6 +159,18 @@ func (g *Gate) handleRequest(ctx context.Context, req *mcp.Request, raw []byte, 
 		})
 	}
 
+	// Tier 1: semantic risk assessment. Only runs on calls Tier 0 already
+	// allowed — Tier 0's deny-by-default and hard argument-pattern guards
+	// still apply first and cannot be overridden by the judge.
+	if g.Judge != nil {
+		if blocked, err := g.runJudge(ctx, req, agent, call.Name, redacted); err != nil {
+			return err
+		} else if blocked {
+			return nil
+		}
+	}
+	g.pushHistory(call.Name, redacted)
+
 	// Forward the sanitized call.
 	sanitized, _ := json.Marshal(map[string]any{
 		"name":      call.Name,
@@ -173,6 +204,78 @@ func (g *Gate) handleRequest(ctx context.Context, req *mcp.Request, raw []byte, 
 		Method: req.Method, Tool: call.Name, Result: resp.Result,
 	})
 	return agent.Write(resp)
+}
+
+// runJudge runs Tier 1 on a call Tier 0 already allowed. It returns
+// blocked=true if the gate has already responded to the agent (either a
+// denial or a failed approval) and the caller should stop processing this
+// request; err is non-nil only for a transport-level failure while
+// responding.
+func (g *Gate) runJudge(ctx context.Context, req *mcp.Request, agent *mcp.Stream, tool string, args map[string]any) (blocked bool, err error) {
+	verdict, jerr := g.Judge.Assess(ctx, judge.ToolCallContext{
+		Tool: tool, Arguments: args, TaskContext: g.TaskContext, RecentHistory: g.history,
+	})
+
+	var route judge.Route
+	if jerr != nil {
+		route = judge.RouteOnError(g.RouterCfg, tool)
+		g.log.Printf("judge error tool=%q err=%v -> route=%s", tool, jerr, route)
+		g.audit(audit.Entry{
+			TS: time.Now(), Kind: "judge_error", RequestID: req.IDString(),
+			Method: req.Method, Tool: tool, Decision: string(route), Error: jerr.Error(),
+		})
+	} else {
+		route = judge.RouteVerdict(g.RouterCfg, verdict)
+		g.audit(audit.Entry{
+			TS: time.Now(), Kind: "judge_verdict", RequestID: req.IDString(),
+			Method: req.Method, Tool: tool, Decision: string(route),
+			Args: mustJSON(map[string]any{
+				"risk_score": verdict.RiskScore,
+				"category":   verdict.Category,
+				"rationale":  verdict.Rationale,
+			}),
+		})
+	}
+
+	switch route {
+	case judge.RouteAllow:
+		return false, nil
+
+	case judge.RouteNeedsApproval:
+		if g.Approver == nil {
+			// No approval channel configured: treat like a plain block
+			// rather than silently auto-allowing a flagged call.
+			return true, g.respondBlocked(agent, req.ID, tool, "requires human approval, no approver configured")
+		}
+		approved, aerr := g.Approver.RequestApproval(ctx, judge.ToolCallContext{Tool: tool, Arguments: args}, verdict)
+		if aerr != nil {
+			g.log.Printf("approval channel error tool=%q err=%v", tool, aerr)
+			return true, g.respondErr(agent, req.ID, -32000, "approval channel error")
+		}
+		if !approved {
+			g.audit(audit.Entry{TS: time.Now(), Kind: "blocked", RequestID: req.IDString(), Method: req.Method, Tool: tool, Decision: "human reviewer denied"})
+			return true, g.respondBlocked(agent, req.ID, tool, "human reviewer denied")
+		}
+		return false, nil
+
+	default: // judge.RouteBlock
+		reason := verdict.Rationale
+		if jerr != nil {
+			reason = "judge unavailable, tool requires a semantic risk check"
+		}
+		g.audit(audit.Entry{TS: time.Now(), Kind: "blocked", RequestID: req.IDString(), Method: req.Method, Tool: tool, Decision: reason})
+		return true, g.respondBlocked(agent, req.ID, tool, reason)
+	}
+}
+
+// pushHistory records a call in the session's rolling history window, used
+// as escalation-pattern context for future judge calls.
+func (g *Gate) pushHistory(tool string, args map[string]any) {
+	b, _ := json.Marshal(args)
+	g.history = append(g.history, tool+"("+string(b)+")")
+	if len(g.history) > historyWindow {
+		g.history = g.history[len(g.history)-historyWindow:]
+	}
 }
 
 // forwardRelay sends a non-policy request downstream and relays the reply.

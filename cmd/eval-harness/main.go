@@ -12,6 +12,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -20,6 +21,7 @@ import (
 	"time"
 
 	"github.com/gunjitdhakar15/AgentGate/internal/gate"
+	"github.com/gunjitdhakar15/AgentGate/internal/judge"
 	"gopkg.in/yaml.v3"
 )
 
@@ -47,14 +49,18 @@ type caseFile struct {
 // caseResult is the per-case outcome, written to the results file so every
 // score in the changelog table can be traced back to a specific case.
 type caseResult struct {
-	ID       string `json:"id"`
-	Category string `json:"category"`
-	Tool     string `json:"tool"`
-	Expected string `json:"expected"`
-	Actual   string `json:"actual"`
-	Correct  bool   `json:"correct"`
-	Reason   string `json:"reason,omitempty"`
-	Rule     string `json:"rule,omitempty"`
+	ID        string  `json:"id"`
+	Category  string  `json:"category"`
+	Tool      string  `json:"tool"`
+	Expected  string  `json:"expected"`
+	Actual    string  `json:"actual"`
+	Correct   bool    `json:"correct"`
+	Reason    string  `json:"reason,omitempty"`
+	Rule      string  `json:"rule,omitempty"`
+	Tier      string  `json:"tier"`                 // "tier0" or "tier0+tier1"
+	RiskScore float64 `json:"risk_score,omitempty"`  // only set when judge ran
+	Route     string  `json:"route,omitempty"`       // only set when judge ran
+	JudgeErr  string  `json:"judge_error,omitempty"`
 }
 
 type categorySummary struct {
@@ -83,8 +89,20 @@ func main() {
 		casesPath  = flag.String("cases", "eval/cases.json", "adversarial case set")
 		outPath    = flag.String("out", "", "write full JSON report here (optional)")
 		label      = flag.String("label", "tier0-baseline", "label for this run, e.g. tier0-baseline, tier0+tier1")
+		withJudge  = flag.Bool("with-judge", false, "also run Tier 1 (LLM judge) on calls Tier 0 allows; requires ANTHROPIC_API_KEY")
+		model      = flag.String("model", "", "override judge model (default: claude-haiku-4-5-20251001)")
 	)
 	flag.Parse()
+
+	var j judge.Judge
+	routerCfg := judge.DefaultRouterConfig()
+	if *withJudge {
+		apiKey := os.Getenv("ANTHROPIC_API_KEY")
+		if apiKey == "" {
+			fatalf("-with-judge requires ANTHROPIC_API_KEY to be set")
+		}
+		j = judge.NewAnthropicJudge(apiKey, *model)
+	}
 
 	cfgBytes, err := os.ReadFile(*configPath)
 	if err != nil {
@@ -119,11 +137,42 @@ func main() {
 		dangerAllowed  int // missed danger
 	)
 
+	ctx := context.Background()
+	tierLabel := "tier0"
+	if *withJudge {
+		tierLabel = "tier0+tier1"
+	}
+
 	for _, c := range cf.Cases {
-		dec, _ := cp.Check(c.Tool, c.Arguments)
+		dec, redacted := cp.Check(c.Tool, c.Arguments)
 		actual := "allow"
 		if !dec.Allowed {
 			actual = "block"
+		}
+
+		cr := caseResult{Tier: tierLabel, Rule: dec.Rule}
+
+		// Tier 1 only runs on calls Tier 0 already allowed — same wiring
+		// as the live gate in internal/gate/gate.go.
+		if *withJudge && dec.Allowed {
+			verdict, jerr := j.Assess(ctx, judge.ToolCallContext{
+				Tool: c.Tool, Arguments: redacted,
+			})
+			var route judge.Route
+			if jerr != nil {
+				route = judge.RouteOnError(routerCfg, c.Tool)
+				cr.JudgeErr = jerr.Error()
+			} else {
+				route = judge.RouteVerdict(routerCfg, verdict)
+				cr.RiskScore = verdict.RiskScore
+			}
+			cr.Route = string(route)
+			// RouteBlock and RouteNeedsApproval both mean the call does
+			// NOT execute silently — score both as "block" here since the
+			// eval cases only label allow/block, not the three-way route.
+			if route != judge.RouteAllow {
+				actual = "block"
+			}
 		}
 
 		cs, ok := byCat[c.Category]
@@ -159,11 +208,10 @@ func main() {
 			}
 		}
 
-		results = append(results, caseResult{
-			ID: c.ID, Category: c.Category, Tool: c.Tool,
-			Expected: c.ExpectedIdeal, Actual: actual, Correct: correctCall,
-			Reason: dec.Reason, Rule: dec.Rule,
-		})
+		cr.ID, cr.Category, cr.Tool = c.ID, c.Category, c.Tool
+		cr.Expected, cr.Actual, cr.Correct = c.ExpectedIdeal, actual, correctCall
+		cr.Reason = dec.Reason
+		results = append(results, cr)
 	}
 
 	var catSummaries []categorySummary
