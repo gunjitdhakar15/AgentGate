@@ -14,6 +14,7 @@ import (
 
 	"github.com/gunjitdhakar15/AgentGate/internal/audit"
 	"github.com/gunjitdhakar15/AgentGate/internal/gate"
+	"github.com/gunjitdhakar15/AgentGate/internal/judge"
 	"github.com/gunjitdhakar15/AgentGate/internal/mcp"
 	"github.com/gunjitdhakar15/AgentGate/internal/web"
 	"gopkg.in/yaml.v3"
@@ -39,6 +40,9 @@ func main() {
 		showPolicy = flag.Bool("check-config", false, "validate config and print compiled policy, then exit")
 		serveAddr  = flag.String("serve", "", "serve the live dashboard on this address (e.g. :8700)")
 		demoMode   = flag.Bool("demo", false, "generate self-driven demo traffic for the dashboard (no gate required)")
+		withJudge  = flag.Bool("with-judge", false, "enable Tier 1 LLM risk classifier (requires ANTHROPIC_API_KEY)")
+		mockJudge  = flag.Bool("mock-judge", false, "enable Tier 1 offline mock risk classifier (no API key required)")
+		model      = flag.String("model", "", "override judge model (default: claude-haiku-4-5-20251001)")
 	)
 	flag.Parse()
 
@@ -98,6 +102,22 @@ func main() {
 		g.Timeout = *timeout
 	} else if cfg.Timeout > 0 {
 		g.Timeout = cfg.Timeout
+	}
+
+	if *mockJudge {
+		g.Judge = judge.NewDeterministicMockJudge()
+		g.RouterCfg = judge.DefaultRouterConfig()
+		g.Approver = judge.NewCLIApprover()
+		log.Printf("tier 1 risk classifier: mock active (router: block >= 0.8, review >= 0.4)")
+	} else if *withJudge {
+		apiKey := os.Getenv("ANTHROPIC_API_KEY")
+		if apiKey == "" {
+			fatalf("-with-judge requires ANTHROPIC_API_KEY to be set (or use -mock-judge for offline evaluation)")
+		}
+		g.Judge = judge.NewAnthropicJudge(apiKey, *model)
+		g.RouterCfg = judge.DefaultRouterConfig()
+		g.Approver = judge.NewCLIApprover()
+		log.Printf("tier 1 risk classifier: claude haiku active (router: block >= 0.8, review >= 0.4)")
 	}
 
 	// The agent talks to us on our own stdio; we talk to the real tool

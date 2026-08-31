@@ -90,16 +90,20 @@ func main() {
 		outPath    = flag.String("out", "", "write full JSON report here (optional)")
 		label      = flag.String("label", "tier0-baseline", "label for this run, e.g. tier0-baseline, tier0+tier1")
 		withJudge  = flag.Bool("with-judge", false, "also run Tier 1 (LLM judge) on calls Tier 0 allows; requires ANTHROPIC_API_KEY")
+		mockJudge  = flag.Bool("mock-judge", false, "run Tier 1 evaluation using offline deterministic simulator (no API key required)")
 		model      = flag.String("model", "", "override judge model (default: claude-haiku-4-5-20251001)")
 	)
 	flag.Parse()
 
 	var j judge.Judge
 	routerCfg := judge.DefaultRouterConfig()
-	if *withJudge {
+	if *mockJudge {
+		j = judge.NewDeterministicMockJudge()
+		*withJudge = true
+	} else if *withJudge {
 		apiKey := os.Getenv("ANTHROPIC_API_KEY")
 		if apiKey == "" {
-			fatalf("-with-judge requires ANTHROPIC_API_KEY to be set")
+			fatalf("-with-judge requires ANTHROPIC_API_KEY to be set (or use -mock-judge for offline evaluation)")
 		}
 		j = judge.NewAnthropicJudge(apiKey, *model)
 	}

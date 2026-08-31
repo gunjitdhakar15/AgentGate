@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gunjitdhakar15/AgentGate/internal/audit"
+	"github.com/gunjitdhakar15/AgentGate/internal/judge"
 	"github.com/gunjitdhakar15/AgentGate/internal/mcp"
 )
 
@@ -273,3 +274,76 @@ func indexOf(s, sub string) int {
 	}
 	return -1
 }
+
+func TestE2ETier1JudgeBlocksHighRiskCall(t *testing.T) {
+	cp := policyFromRules([]ToolRule{
+		{ApplyTo: "*", Allow: true},
+	}, nil, nil)
+
+	g, w, r, store := testGate(t, cp)
+	g.Judge = &judge.MockJudge{
+		CustomAssess: func(tc judge.ToolCallContext) (judge.Verdict, error) {
+			return judge.Verdict{
+				RiskScore: 0.95,
+				Category:  judge.CategoryDestructive,
+				Rationale: "Destructive filesystem operation detected",
+			}, nil
+		},
+	}
+	g.RouterCfg = judge.DefaultRouterConfig()
+
+	data := e2eRun(t, w, r, "tools/call", map[string]any{
+		"name":      "shell",
+		"arguments": map[string]any{"command": "find / -delete"},
+	})
+
+	if !contains(string(data), "Destructive filesystem operation detected") && !contains(string(data), "AgentGate blocked") {
+		t.Fatalf("expected judge block message, got: %s", data)
+	}
+
+	entries, err := audit.Replay(store.Path())
+	if err != nil {
+		t.Fatal(err)
+	}
+	var judgeVerdicts []audit.Entry
+	for _, e := range entries {
+		if e.Kind == "judge_verdict" {
+			judgeVerdicts = append(judgeVerdicts, e)
+		}
+	}
+	if len(judgeVerdicts) != 1 {
+		t.Fatalf("expected 1 judge_verdict audit entry, got %d", len(judgeVerdicts))
+	}
+	if judgeVerdicts[0].Decision != "block" {
+		t.Errorf("expected decision 'block', got %q", judgeVerdicts[0].Decision)
+	}
+}
+
+func TestE2ETier1JudgeApprovalFlow(t *testing.T) {
+	cp := policyFromRules([]ToolRule{
+		{ApplyTo: "*", Allow: true},
+	}, nil, nil)
+
+	g, w, r, _ := testGate(t, cp)
+	g.Judge = &judge.MockJudge{
+		CustomAssess: func(tc judge.ToolCallContext) (judge.Verdict, error) {
+			return judge.Verdict{
+				RiskScore: 0.55, // in review threshold band [0.4, 0.8)
+				Category:  judge.CategoryPersistence,
+				Rationale: "Cron job creation requires review",
+			}, nil
+		},
+	}
+	g.RouterCfg = judge.DefaultRouterConfig()
+	g.Approver = judge.AutoDenyApprover{}
+
+	data := e2eRun(t, w, r, "tools/call", map[string]any{
+		"name":      "shell",
+		"arguments": map[string]any{"command": "crontab -e"},
+	})
+
+	if !contains(string(data), "human reviewer denied") && !contains(string(data), "AgentGate blocked") {
+		t.Fatalf("expected auto-deny rejection, got: %s", data)
+	}
+}
+
