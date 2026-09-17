@@ -1,0 +1,24 @@
+services:
+  agentgate-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agentgate-dashboard
+    ports:
+      - "8700:8700"
+    command: ["-serve", ":8700", "-demo"]
+    restart: unless-stopped
+
+  agentgate-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agentgate-proxy
+    volumes:
+      - ./configs:/app/configs:ro
+      - ./audit:/app/audit
+    command: ["-config", "configs/agentgate.yaml", "-serve", ":8700"]
+    ports:
+      - "8701:8700"
+    profiles:
+      - proxy
