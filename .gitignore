@@ -1,18 +1,41 @@
-# Binaries (root only; cmd/ holds source)
-/agentgate
-/agentgate.exe
-/mock-tools
-/mock-tools.exe
+# Binaries & Build Artifacts
+/bin/
+/dist/
 *.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/agentgate
+/mock-tools
+/eval-harness
 
-# Audit logs (runtime artifacts; internal/audit is source and stays tracked)
+# Archives & Temporary Backups
+*.zip
+*.tar.gz
+*.bundle
+*~
+*.swp
+*.bak
+
+# Runtime & Audit Logs
 *.jsonl
 /audit/
+*.log
 
-# IDE
+# Test & Coverage Artifacts
+*.out
+coverage.html
+coverage.txt
+.testcoverage
+
+# Environment & Local Secrets
+.env
+.env.local
+.env.*.local
+
+# IDE & OS
 .idea/
 .vscode/
-
-# OS
 .DS_Store
 Thumbs.db
