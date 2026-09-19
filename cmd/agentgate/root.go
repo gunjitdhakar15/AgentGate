@@ -67,18 +67,24 @@ redacting secrets, rate-limiting, and auditing every single tool invocation.`,
 		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 		defer stop()
 
-		// Dashboard-only mode: no config, no gate; watch an audit log or demo traffic
-		if cfgFile == "" && serveAddr != "" {
-			runWatcher(ctx, serveAddr, auditPath, demoMode)
-			return nil
+		// Auto-detect Render/Cloud PORT environment variable
+		if port := os.Getenv("PORT"); port != "" && serveAddr == "" {
+			if !strings.HasPrefix(port, ":") {
+				serveAddr = ":" + port
+			} else {
+				serveAddr = port
+			}
 		}
-		if demoMode {
+
+		// Dashboard / Demo / Cloud-serve mode:
+		if serveAddr != "" || demoMode {
 			if serveAddr == "" {
 				serveAddr = ":8700"
 			}
-			runWatcher(ctx, serveAddr, auditPath, true)
+			runWatcher(ctx, serveAddr, auditPath, demoMode)
 			return nil
 		}
+
 		if cfgFile == "" {
 			cfgFile = "configs/agentgate.yaml"
 		}
@@ -102,6 +108,13 @@ var dashboardCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 		defer stop()
+		if port := os.Getenv("PORT"); port != "" && serveAddr == "" {
+			if !strings.HasPrefix(port, ":") {
+				serveAddr = ":" + port
+			} else {
+				serveAddr = port
+			}
+		}
 		if serveAddr == "" {
 			serveAddr = ":8700"
 		}
@@ -116,6 +129,13 @@ var demoCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 		defer stop()
+		if port := os.Getenv("PORT"); port != "" && serveAddr == "" {
+			if !strings.HasPrefix(port, ":") {
+				serveAddr = ":" + port
+			} else {
+				serveAddr = port
+			}
+		}
 		if serveAddr == "" {
 			serveAddr = ":8700"
 		}
