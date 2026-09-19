@@ -5,43 +5,60 @@ import (
 	"time"
 )
 
-// TokenBucket is a classic fixed-window-ish burst limiter per key.
+// TokenBucket is a thread-safe continuous token-bucket rate limiter per key.
 type TokenBucket struct {
 	mu     sync.Mutex
-	burst  int
-	window time.Duration
+	burst  float64
+	rate   float64 // tokens per second
 	tokens map[string]*bucketState
 }
 
 type bucketState struct {
-	count    int
-	windowAt time.Time
+	tokens     float64
+	lastRefill time.Time
 }
 
-// NewRateLimiter builds a limiter with per-key buckets. burst<=0 disables.
+// NewRateLimiter builds a limiter with per-key token buckets. burst<=0 disables.
 func NewRateLimiter(burst int, window time.Duration) *TokenBucket {
 	if burst <= 0 || window <= 0 {
 		return &TokenBucket{burst: 0}
 	}
-	return &TokenBucket{burst: burst, window: window, tokens: make(map[string]*bucketState)}
+	rate := float64(burst) / window.Seconds()
+	return &TokenBucket{
+		burst:  float64(burst),
+		rate:   rate,
+		tokens: make(map[string]*bucketState),
+	}
 }
 
 // Allow reports whether a call for key may proceed, consuming a token.
 func (b *TokenBucket) Allow(key string) bool {
-	if b.burst == 0 {
+	if b.burst <= 0 {
 		return true
 	}
 	b.mu.Lock()
 	defer b.mu.Unlock()
+
 	now := time.Now()
 	st, ok := b.tokens[key]
-	if !ok || now.Sub(st.windowAt) >= b.window {
-		st = &bucketState{count: 0, windowAt: now}
+	if !ok {
+		st = &bucketState{tokens: b.burst, lastRefill: now}
 		b.tokens[key] = st
+	} else {
+		elapsed := now.Sub(st.lastRefill).Seconds()
+		if elapsed > 0 {
+			st.tokens += elapsed * b.rate
+			if st.tokens > b.burst {
+				st.tokens = b.burst
+			}
+			st.lastRefill = now
+		}
 	}
-	if st.count >= b.burst {
-		return false
+
+	if st.tokens >= 1.0 {
+		st.tokens -= 1.0
+		return true
 	}
-	st.count++
-	return true
+	return false
 }
+

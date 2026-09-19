@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/gunjitdhakar15/AgentGate/internal/audit"
@@ -296,31 +297,38 @@ func (g *Gate) readReply(ctx context.Context, server *mcp.Stream) (*mcp.Response
 	if timeout <= 0 {
 		timeout = 10 * time.Minute
 	}
-	done := make(chan *mcp.Response, 1)
-	errCh := make(chan error, 1)
+	timer := time.NewTimer(timeout)
+	defer timer.Stop()
+
+	type replyResult struct {
+		resp *mcp.Response
+		err  error
+	}
+	done := make(chan replyResult, 1)
 	go func() {
 		data, err := server.Read()
 		if err != nil {
-			errCh <- err
+			done <- replyResult{err: err}
 			return
 		}
 		resp, err := mcp.ParseResponse(data)
 		if err != nil {
-			errCh <- err
+			done <- replyResult{err: err}
 			return
 		}
-		done <- resp
+		done <- replyResult{resp: resp}
 	}()
 
 	select {
-	case resp := <-done:
-		return resp, nil
-	case err := <-errCh:
-		return nil, fmt.Errorf("read reply: %w", err)
+	case res := <-done:
+		if res.err != nil {
+			return nil, fmt.Errorf("read reply: %w", res.err)
+		}
+		return res.resp, nil
 	case <-ctx.Done():
 		return nil, ctx.Err()
-	case <-time.After(timeout):
-		return nil, fmt.Errorf("timed out waiting for tool server reply")
+	case <-timer.C:
+		return nil, fmt.Errorf("timed out waiting for tool server reply (%v)", timeout)
 	}
 }
 
@@ -430,13 +438,5 @@ func mustJSON(v any) json.RawMessage {
 }
 
 func stringsEqualFold(a, b string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] && a[i]|0x20 != b[i]|0x20 {
-			return false
-		}
-	}
-	return true
+	return strings.EqualFold(a, b)
 }
