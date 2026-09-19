@@ -1,4 +1,5 @@
 # AgentGate
+<img width="1822" height="848" alt="image" src="https://github.com/user-attachments/assets/ef85d08a-3d79-4a04-8b32-f626767d3e24" />
 
 > 🏆 **micro1 Frontier/Agentic Workflows Hackathon 2026 Submission** — Read the complete submission package in [SUBMISSION.md](SUBMISSION.md).  
 > 🚀 **See it live:** [agentgate-demo.onrender.com](https://agentgate-demo.onrender.com) — landing page + working live firewall dashboard with real-time SSE event streaming.
