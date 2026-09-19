@@ -166,3 +166,34 @@ func TestRedactPayloadRoundTrip(t *testing.T) {
 		t.Fatalf("response secret not redacted: %v", decoded["secret"])
 	}
 }
+
+func TestStringsEqualFold(t *testing.T) {
+	if !stringsEqualFold("Read_File", "read_file") {
+		t.Fatal("case insensitive match failed")
+	}
+	// Symbols with 0x20 bit diff should not falsely match (e.g. '@' vs '`')
+	if stringsEqualFold("@", "`") {
+		t.Fatal("symbols @ and ` must not match")
+	}
+	if stringsEqualFold("[", "{") {
+		t.Fatal("symbols [ and { must not match")
+	}
+}
+
+func TestRateLimiterRefill(t *testing.T) {
+	// 10 tokens per second -> 1 token every 100ms
+	b := NewRateLimiter(2, 200*time.Millisecond)
+	if !b.Allow("tool") {
+		t.Fatal("1st call allowed")
+	}
+	if !b.Allow("tool") {
+		t.Fatal("2nd call allowed")
+	}
+	if b.Allow("tool") {
+		t.Fatal("3rd call exhausted")
+	}
+	time.Sleep(120 * time.Millisecond)
+	if !b.Allow("tool") {
+		t.Fatal("call should be allowed after token refill")
+	}
+}

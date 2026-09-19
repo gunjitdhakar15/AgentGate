@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 )
@@ -22,17 +23,26 @@ type Approver interface {
 	RequestApproval(ctx context.Context, tc ToolCallContext, v Verdict) (approved bool, err error)
 }
 
-// CLIApprover prompts on stdin/stdout. This is the reference
-// implementation used by the demo and by default config — good enough to
-// prove the checkpoint works end to end; not what a real multi-user
-// deployment would ship.
+// CLIApprover prompts the operator for approval. It writes prompts to
+// os.Stderr (never os.Stdout, which is reserved for the agent's MCP JSON-RPC stream)
+// and reads response from the configured input reader.
 type CLIApprover struct {
 	in  *bufio.Reader
-	out *os.File
+	out io.Writer
 }
 
 func NewCLIApprover() *CLIApprover {
-	return &CLIApprover{in: bufio.NewReader(os.Stdin), out: os.Stdout}
+	return NewCustomCLIApprover(os.Stdin, os.Stderr)
+}
+
+func NewCustomCLIApprover(in io.Reader, out io.Writer) *CLIApprover {
+	if in == nil {
+		in = os.Stdin
+	}
+	if out == nil {
+		out = os.Stderr
+	}
+	return &CLIApprover{in: bufio.NewReader(in), out: out}
 }
 
 func (a *CLIApprover) RequestApproval(ctx context.Context, tc ToolCallContext, v Verdict) (bool, error) {
@@ -55,7 +65,7 @@ func (a *CLIApprover) RequestApproval(ctx context.Context, tc ToolCallContext, v
 		return false, ctx.Err()
 	case r := <-ch:
 		if r.err != nil {
-			return false, fmt.Errorf("approver: read stdin: %w", r.err)
+			return false, fmt.Errorf("approver: read input: %w", r.err)
 		}
 		ans := strings.ToLower(strings.TrimSpace(r.line))
 		return ans == "y" || ans == "yes", nil
