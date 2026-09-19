@@ -10,10 +10,10 @@
 <style>
   :root {
     --bg-base: #030805;
-    --panel-bg: rgba(13, 21, 38, 0.85);
+    --panel-bg: rgba(13, 21, 38, 0.88);
     --panel-border: rgba(255, 255, 255, 0.08);
     --panel-border-hover: rgba(56, 189, 248, 0.45);
-    --panel-sub: rgba(9, 15, 28, 0.92);
+    --panel-sub: rgba(9, 15, 28, 0.95);
     
     --text-main: #ffffff;
     --text-muted: #94a3b8;
@@ -64,28 +64,31 @@
     font-size: 13px;
     line-height: 1.45;
     height: 100vh;
+    min-height: 600px;
     width: 100vw;
-    padding: 14px 20px;
-    overflow: hidden; /* Clean fit-to-screen without outer scrolling */
+    padding: 12px 18px;
+    overflow: hidden;
+    user-select: none;
   }
 
   .app-container {
-    max-width: 1680px;
+    max-width: 1720px;
     height: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+    min-height: 0;
   }
 
-  /* Top Navigation Bar */
+  /* Top Navigation Header */
   header {
     background: var(--panel-bg);
     backdrop-filter: blur(20px) saturate(190%);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--panel-border);
     border-radius: 12px;
-    padding: 8px 18px;
+    padding: 8px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -112,7 +115,7 @@
 
   .brand-title {
     font-family: var(--font-head);
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 800;
     color: #ffffff;
     display: flex;
@@ -123,7 +126,7 @@
 
   .chip-tag {
     font-family: var(--font-mono);
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     padding: 2px 8px;
@@ -133,15 +136,28 @@
     border: 1px solid rgba(56, 189, 248, 0.35);
   }
 
-  .nav-actions {
+  .nav-controls {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
+
+  .preset-btn {
+    background: var(--panel-sub);
+    border: 1px solid var(--panel-border);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .preset-btn:hover { color: #fff; border-color: var(--primary); }
 
   .backend-badge {
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 11px;
     color: #38bdf8;
     background: rgba(56, 189, 248, 0.1);
     border: 1px solid rgba(56, 189, 248, 0.28);
@@ -155,19 +171,19 @@
   .live-status {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
     background: rgba(16, 185, 129, 0.15);
     border: 1px solid rgba(16, 185, 129, 0.35);
-    padding: 4px 12px;
+    padding: 4px 10px;
     border-radius: 999px;
     color: #34d399;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 700;
   }
 
   .radar-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: #34d399;
     position: relative;
@@ -190,37 +206,93 @@
   .home-link {
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 600;
-    padding: 4px 10px;
+    padding: 4px 8px;
     border-radius: 6px;
     transition: all 0.15s ease;
   }
   .home-link:hover { color: #fff; background: rgba(255,255,255,0.06); }
 
-  /* 2-Column Master Grid Layout */
-  .master-grid {
-    display: grid;
-    grid-template-columns: 1.22fr 0.98fr;
-    gap: 14px;
+  /* Interactive Master Resizable Flexbox & Grid */
+  .resizable-workspace {
+    display: flex;
+    flex-direction: row;
     flex: 1;
-    min-height: 0; /* Prevents container overflow */
+    min-height: 0;
+    width: 100%;
+    gap: 0;
+    position: relative;
   }
 
   /* Left Column: Command & Decision Center */
   .col-left {
     display: flex;
     flex-direction: column;
-    gap: 14px;
     min-height: 0;
+    min-width: 320px;
+    width: 58%;
+    flex-shrink: 0;
+  }
+
+  /* Vertical Column Splitter (Draggable) */
+  .gutter-col {
+    width: 10px;
+    cursor: col-resize;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+  }
+  .gutter-col::after {
+    content: '';
+    width: 3px;
+    height: 36px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+  }
+  .gutter-col:hover::after, .gutter-col.dragging::after {
+    background: var(--primary);
+    box-shadow: 0 0 10px var(--primary-bright);
+    height: 60px;
+    width: 4px;
   }
 
   /* Right Column: Metrics & Telemetry Stream */
   .col-right {
     display: flex;
     flex-direction: column;
-    gap: 14px;
     min-height: 0;
+    min-width: 320px;
+    flex: 1;
+  }
+
+  /* Horizontal Row Splitters (Draggable) */
+  .gutter-row {
+    height: 10px;
+    cursor: row-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .gutter-row::after {
+    content: '';
+    height: 3px;
+    width: 36px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+  }
+  .gutter-row:hover::after, .gutter-row.dragging::after {
+    background: var(--primary);
+    box-shadow: 0 0 10px var(--primary-bright);
+    width: 60px;
+    height: 4px;
   }
 
   /* Shared Card Styling */
@@ -229,17 +301,21 @@
     backdrop-filter: blur(20px) saturate(190%);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--panel-border);
-    border-radius: 14px;
-    padding: 14px 16px;
+    border-radius: 12px;
+    padding: 12px 14px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
+    min-height: 0;
+    min-width: 0;
     position: relative;
+    user-select: text;
   }
 
-  /* Command & 2D Pipeline Flow Card */
+  /* Left Top: Control & 2D Pipeline Flow Card */
   .control-card {
-    flex-shrink: 0;
+    height: 40%;
+    min-height: 140px;
   }
 
   .card-title-row {
@@ -247,11 +323,12 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+    flex-shrink: 0;
   }
 
   .card-title {
     font-family: var(--font-head);
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 700;
     color: #fff;
     display: flex;
@@ -263,23 +340,25 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
   }
 
   .script-select {
     flex: 1;
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 8px 12px;
+    border-radius: 7px;
+    padding: 7px 10px;
     color: #fff;
     font-family: var(--font-mono);
     font-size: 12px;
     outline: none;
     cursor: pointer;
+    min-width: 0;
   }
   .script-select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
   }
   .script-select option {
     background: #0b1120;
@@ -290,30 +369,32 @@
     flex: 1;
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 8px 12px;
+    border-radius: 7px;
+    padding: 7px 10px;
     color: #fff;
     font-family: var(--font-mono);
     font-size: 12px;
     outline: none;
     display: none;
+    min-width: 0;
   }
   .custom-cmd-input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
   }
 
   .btn-mode-toggle {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
     color: var(--text-muted);
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 600;
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 7px 10px;
+    border-radius: 7px;
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.15s ease;
+    flex-shrink: 0;
   }
   .btn-mode-toggle:hover {
     color: #fff;
@@ -325,17 +406,18 @@
     color: #041019;
     font-family: var(--font-head);
     font-weight: 800;
-    font-size: 13px;
-    padding: 8px 18px;
-    border-radius: 8px;
+    font-size: 12.5px;
+    padding: 7px 16px;
+    border-radius: 7px;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
     box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
     white-space: nowrap;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
+    flex-shrink: 0;
   }
   .btn-fire:hover { transform: translateY(-1px); box-shadow: 0 0 22px rgba(16, 185, 129, 0.5); }
   .btn-fire:active { transform: translateY(0); }
@@ -345,17 +427,21 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
-    padding-top: 4px;
+    gap: 4px;
+    flex: 1;
+    min-height: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 0;
   }
 
   .pipe-node {
     flex: 1;
-    min-width: 0;
+    min-width: 80px;
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 9px;
-    padding: 8px 6px;
+    border-radius: 8px;
+    padding: 6px 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -366,34 +452,34 @@
 
   .pipe-node.active {
     border-color: var(--primary);
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.45), inset 0 0 6px rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.45), inset 0 0 6px rgba(56, 189, 248, 0.2);
     transform: translateY(-2px);
   }
 
   .pipe-node.blocked {
     border-color: var(--red);
-    box-shadow: 0 0 16px rgba(244, 63, 94, 0.55), inset 0 0 6px rgba(244, 63, 94, 0.25);
+    box-shadow: 0 0 14px rgba(244, 63, 94, 0.55), inset 0 0 6px rgba(244, 63, 94, 0.25);
     transform: translateY(-2px);
   }
 
   .pipe-node.passed {
     border-color: var(--green);
-    box-shadow: 0 0 16px rgba(16, 185, 129, 0.45);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
   }
 
   .pipe-node.review {
     border-color: var(--amber);
-    box-shadow: 0 0 16px rgba(245, 158, 11, 0.55);
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.55);
     transform: translateY(-2px);
   }
 
-  .node-icon { font-size: 15px; line-height: 1.1; }
-  .node-name { font-family: var(--font-head); font-size: 12px; font-weight: 700; white-space: nowrap; }
-  .node-role { font-size: 9.5px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95%; }
+  .node-icon { font-size: 14px; line-height: 1; }
+  .node-name { font-family: var(--font-head); font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .node-role { font-size: 9px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95%; }
 
   .flow-arrow {
     color: var(--text-dim);
-    font-size: 13px;
+    font-size: 11px;
     transition: all 0.2s ease;
     flex-shrink: 0;
   }
@@ -403,10 +489,10 @@
     transform: scale(1.3);
   }
 
-  /* Live Decision Inspector Card (Fills remaining height in left column) */
+  /* Left Bottom: Live Decision Inspector Card */
   .inspector-card {
     flex: 1;
-    min-height: 0;
+    min-height: 160px;
     overflow: hidden;
   }
 
@@ -414,17 +500,17 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
   }
 
   .verdict-badge {
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 800;
-    padding: 3px 12px;
-    border-radius: 6px;
+    padding: 3px 10px;
+    border-radius: 5px;
     text-transform: uppercase;
   }
   .verdict-badge.block { background: rgba(244, 63, 94, 0.22); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.45); }
@@ -435,30 +521,31 @@
   .breakdown-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: 6px;
     flex-shrink: 0;
   }
 
   .breakdown-item {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 6px 10px;
+    border-radius: 7px;
+    padding: 5px 8px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
+    min-width: 0;
   }
 
-  .item-lbl { font-size: 9.5px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; }
-  .item-val { font-family: var(--font-mono); font-size: 12px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-lbl { font-size: 9px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; }
+  .item-val { font-family: var(--font-mono); font-size: 11.5px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   .rationale-box {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
     border-left: 3px solid var(--primary);
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 12.5px;
+    border-radius: 7px;
+    padding: 6px 10px;
+    font-size: 12px;
     color: #e2e8f0;
     flex-shrink: 0;
   }
@@ -467,18 +554,18 @@
     display: none;
     background: rgba(245, 158, 11, 0.14);
     border: 1px solid rgba(245, 158, 11, 0.4);
-    border-radius: 8px;
-    padding: 8px 12px;
+    border-radius: 7px;
+    padding: 6px 10px;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
     flex-shrink: 0;
   }
   .btn-hitl {
-    padding: 4px 12px;
+    padding: 4px 10px;
     border-radius: 5px;
     font-weight: 700;
-    font-size: 11.5px;
+    font-size: 11px;
     border: none;
     cursor: pointer;
   }
@@ -486,10 +573,10 @@
   .code-viewer {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 8px;
+    border-radius: 7px;
     overflow: hidden;
     flex: 1;
-    min-height: 0;
+    min-height: 60px;
     display: flex;
     flex-direction: column;
   }
@@ -497,9 +584,9 @@
   .code-viewer-head {
     background: rgba(255, 255, 255, 0.03);
     border-bottom: 1px solid var(--panel-border);
-    padding: 6px 10px;
+    padding: 4px 8px;
     font-family: var(--font-mono);
-    font-size: 10.5px;
+    font-size: 10px;
     color: var(--text-dim);
     display: flex;
     justify-content: space-between;
@@ -507,29 +594,35 @@
   }
 
   pre.code-viewer-body {
-    padding: 8px 12px;
+    padding: 6px 10px;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11.5px;
     color: #e2e8f0;
     overflow: auto;
     flex: 1;
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.35;
   }
 
-  /* Right Column: 2x2 Metric Cards Grid (Moved UP into top row) */
+  /* Right Top: 2x2 Key Metric Tiles (Resizable Card Container) */
+  .kpi-container {
+    height: 32%;
+    min-height: 120px;
+  }
+
   .metrics-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    flex-shrink: 0;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
   }
 
   .metric-card {
-    background: var(--panel-bg);
+    background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 10px 14px;
+    border-radius: 9px;
+    padding: 8px 12px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -551,7 +644,7 @@
   .metric-card.warn::before { background: var(--amber-gradient); }
 
   .metric-lbl {
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     color: var(--text-muted);
@@ -560,17 +653,17 @@
 
   .metric-val {
     font-family: var(--font-head);
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 800;
     color: #fff;
     line-height: 1.15;
-    margin-top: 2px;
+    margin-top: 1px;
   }
 
-  /* Right Column: Live Telemetry Audit Stream Card (Fills remaining height) */
+  /* Right Bottom: Live Telemetry Audit Stream Card */
   .telemetry-card {
     flex: 1;
-    min-height: 0;
+    min-height: 160px;
     overflow: hidden;
   }
 
@@ -578,22 +671,22 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
   }
 
   .feed-filters {
     display: flex;
-    gap: 5px;
+    gap: 4px;
   }
 
   .filter-btn {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 5px;
-    padding: 3px 9px;
-    font-size: 11px;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 10.5px;
     color: var(--text-muted);
     cursor: pointer;
     transition: all 0.15s ease;
@@ -607,23 +700,23 @@
   .telemetry-table {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
-    padding-right: 3px;
+    padding-right: 2px;
   }
 
   .feed-row {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 7px;
-    padding: 7px 10px;
+    border-radius: 6px;
+    padding: 5px 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    font-size: 12px;
+    gap: 6px;
+    font-size: 11.5px;
     animation: row-in 0.22s ease;
     flex-shrink: 0;
   }
@@ -635,11 +728,11 @@
 
   .feed-tag {
     font-family: var(--font-mono);
-    font-size: 9.5px;
+    font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: 1.5px 5px;
+    border-radius: 3px;
     flex-shrink: 0;
   }
   .feed-tag.blocked { background: rgba(244, 63, 94, 0.22); color: #fb7185; }
@@ -657,15 +750,15 @@
   .feed-args {
     font-family: var(--font-mono);
     color: var(--text-dim);
-    font-size: 11px;
+    font-size: 10.5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 250px;
+    max-width: 220px;
   }
 
   /* Custom scrollbars */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 999px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
@@ -675,7 +768,7 @@
 
 <div class="app-container">
 
-  <!-- Top Navigation Header -->
+  <!-- Top Navigation Header with Layout Controls -->
   <header>
     <div class="brand-group">
       <div class="logo-shield">
@@ -689,7 +782,10 @@
       </div>
     </div>
     
-    <div class="nav-actions">
+    <div class="nav-controls">
+      <button class="preset-btn" title="Set balanced layout" onclick="setLayoutPreset(55, 40, 32)">🖥️ Balanced</button>
+      <button class="preset-btn" title="Expand Inspector" onclick="setLayoutPreset(68, 35, 30)">🔍 Focus Inspector</button>
+      <button class="preset-btn" title="Expand Telemetry Stream" onclick="setLayoutPreset(42, 45, 30)">📡 Focus Telemetry</button>
       <div class="backend-badge" title="Go In-Memory Regex & AST Engine running in microsecond latency">
         <span>⚡</span> Go Engine Active (Real-Time)
       </div>
@@ -701,14 +797,14 @@
     </div>
   </header>
 
-  <!-- 2-Column Master Grid -->
-  <div class="master-grid">
+  <!-- Interactive Master Resizable Workspace -->
+  <div class="resizable-workspace" id="workspace">
 
     <!-- LEFT COLUMN: Command Center & Decision Inspector -->
-    <div class="col-left">
+    <div class="col-left" id="col-left">
 
       <!-- Top Left: Control & 2D Pipeline Console -->
-      <div class="card-panel control-card">
+      <div class="card-panel control-card" id="card-control">
         <div class="card-title-row">
           <span class="card-title">Interactive Tool Evaluation &amp; 2D Architecture Pipeline</span>
           <span style="font-family: var(--font-mono); font-size: 11px; color: var(--primary);" id="bd-latency-tag">⚡ Engine Latency: &lt;0.5ms</span>
@@ -807,10 +903,13 @@
         </div>
       </div>
 
+      <!-- Left Horizontal Splitter (Draggable) -->
+      <div class="gutter-row" id="gutter-left-row" title="Drag vertically to resize control vs inspector"></div>
+
       <!-- Bottom Left: Live Decision Inspector -->
-      <div class="card-panel inspector-card">
+      <div class="card-panel inspector-card" id="card-inspector">
         <div class="inspector-header">
-          <div style="font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+          <div style="font-weight: 700; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
             <span>Active Interception Decision:</span>
             <span id="bd-tool-badge" style="font-family: var(--font-mono); color: var(--primary);">shell</span>
           </div>
@@ -842,7 +941,7 @@
 
         <!-- HITL Confirmation Box -->
         <div class="hitl-box" id="hitl-panel">
-          <div style="font-size: 12px; color: #fbbf24; font-weight: 600;">
+          <div style="font-size: 11.5px; color: #fbbf24; font-weight: 600;">
             ⚠️ Operator Confirmation Required (Risk: 0.55)
           </div>
           <div style="display: flex; gap: 8px;">
@@ -863,31 +962,43 @@
 
     </div>
 
-    <!-- RIGHT COLUMN: Metrics Grid & Live Telemetry Stream -->
-    <div class="col-right">
+    <!-- Center Vertical Splitter (Draggable) -->
+    <div class="gutter-col" id="gutter-col" title="Drag horizontally to resize columns"></div>
 
-      <!-- Top Right: 2x2 Key Metric Tiles (Moved UP into prominent position) -->
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <span class="metric-lbl">Total Interceptions</span>
-          <span class="metric-val" id="cnt-total">0</span>
+    <!-- RIGHT COLUMN: Metrics Grid & Live Telemetry Stream -->
+    <div class="col-right" id="col-right">
+
+      <!-- Top Right: 2x2 Key Metric Tiles (Resizable Card Container) -->
+      <div class="card-panel kpi-container" id="card-kpi">
+        <div class="card-title-row">
+          <span class="card-title">Real-Time Firewall Security KPIs</span>
+          <span style="font-size: 10px; color: var(--text-dim); font-family: var(--font-mono);">⚡ LIVE METRICS</span>
         </div>
-        <div class="metric-card bad">
-          <span class="metric-lbl">Blocked Threats</span>
-          <span class="metric-val" id="cnt-blocked" style="color: var(--red-bright);">0</span>
-        </div>
-        <div class="metric-card ok">
-          <span class="metric-lbl">Passed / Allowed</span>
-          <span class="metric-val" id="cnt-allowed" style="color: var(--green-bright);">0</span>
-        </div>
-        <div class="metric-card purple">
-          <span class="metric-lbl">Secrets Redacted</span>
-          <span class="metric-val" id="cnt-redacted" style="color: var(--purple-bright);">0</span>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <span class="metric-lbl">Total Interceptions</span>
+            <span class="metric-val" id="cnt-total">0</span>
+          </div>
+          <div class="metric-card bad">
+            <span class="metric-lbl">Blocked Threats</span>
+            <span class="metric-val" id="cnt-blocked" style="color: var(--red-bright);">0</span>
+          </div>
+          <div class="metric-card ok">
+            <span class="metric-lbl">Passed / Allowed</span>
+            <span class="metric-val" id="cnt-allowed" style="color: var(--green-bright);">0</span>
+          </div>
+          <div class="metric-card purple">
+            <span class="metric-lbl">Secrets Redacted</span>
+            <span class="metric-val" id="cnt-redacted" style="color: var(--purple-bright);">0</span>
+          </div>
         </div>
       </div>
 
+      <!-- Right Horizontal Splitter (Draggable) -->
+      <div class="gutter-row" id="gutter-right-row" title="Drag vertically to resize metrics vs telemetry"></div>
+
       <!-- Bottom Right: Live Telemetry Audit Feed -->
-      <div class="card-panel telemetry-card">
+      <div class="card-panel telemetry-card" id="card-telemetry">
         <div class="telemetry-head">
           <span class="card-title">Live Telemetry Audit Feed</span>
           <div class="feed-filters">
@@ -931,6 +1042,101 @@
   let allAuditEntries = [];
   let currentFeedFilter = 'all';
   let isCustomMode = false;
+
+  // --- Interactive Drag Resizer Engine ---
+  function initResizers() {
+    const ws = document.getElementById('workspace');
+    const colLeft = document.getElementById('col-left');
+    const gutterCol = document.getElementById('gutter-col');
+
+    const cardControl = document.getElementById('card-control');
+    const gutterLeftRow = document.getElementById('gutter-left-row');
+
+    const cardKpi = document.getElementById('card-kpi');
+    const gutterRightRow = document.getElementById('gutter-right-row');
+
+    // 1. Column Resizer (Horizontal)
+    gutterCol.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      gutterCol.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+
+      const onMouseMove = (ev) => {
+        const rect = ws.getBoundingClientRect();
+        let newWidth = ((ev.clientX - rect.left) / rect.width) * 100;
+        if (newWidth < 25) newWidth = 25;
+        if (newWidth > 75) newWidth = 75;
+        colLeft.style.width = newWidth + '%';
+      };
+
+      const onMouseUp = () => {
+        gutterCol.classList.remove('dragging');
+        document.body.style.cursor = '';
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    });
+
+    // 2. Left Row Resizer (Vertical)
+    gutterLeftRow.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      gutterLeftRow.classList.add('dragging');
+      document.body.style.cursor = 'row-resize';
+
+      const onMouseMove = (ev) => {
+        const rect = colLeft.getBoundingClientRect();
+        let newHeight = ((ev.clientY - rect.top) / rect.height) * 100;
+        if (newHeight < 20) newHeight = 20;
+        if (newHeight > 70) newHeight = 70;
+        cardControl.style.height = newHeight + '%';
+      };
+
+      const onMouseUp = () => {
+        gutterLeftRow.classList.remove('dragging');
+        document.body.style.cursor = '';
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    });
+
+    // 3. Right Row Resizer (Vertical for KPI Box)
+    gutterRightRow.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      gutterRightRow.classList.add('dragging');
+      document.body.style.cursor = 'row-resize';
+
+      const onMouseMove = (ev) => {
+        const colRight = document.getElementById('col-right');
+        const rect = colRight.getBoundingClientRect();
+        let newHeight = ((ev.clientY - rect.top) / rect.height) * 100;
+        if (newHeight < 18) newHeight = 18;
+        if (newHeight > 65) newHeight = 65;
+        cardKpi.style.height = newHeight + '%';
+      };
+
+      const onMouseUp = () => {
+        gutterRightRow.classList.remove('dragging');
+        document.body.style.cursor = '';
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    });
+  }
+
+  function setLayoutPreset(colWidthPct, controlHeightPct, kpiHeightPct) {
+    document.getElementById('col-left').style.width = colWidthPct + '%';
+    document.getElementById('card-control').style.height = controlHeightPct + '%';
+    document.getElementById('card-kpi').style.height = kpiHeightPct + '%';
+  }
 
   function toggleCustomMode() {
     isCustomMode = !isCustomMode;
@@ -1188,6 +1394,7 @@
   // Initial load
   onSelectScenario();
   connectSSE();
+  initResizers();
 </script>
 
 </body>
