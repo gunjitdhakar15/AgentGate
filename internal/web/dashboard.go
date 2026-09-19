@@ -119,7 +119,6 @@ func (d *Dashboard) Subscribe() (<-chan event, func()) {
 	return ch, func() {
 		d.mu.Lock()
 		delete(d.subs, ch)
-		close(ch)
 		d.mu.Unlock()
 	}
 }
