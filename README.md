@@ -13,21 +13,23 @@ An intelligent, tiered **security firewall** for AI agent tool calls (MCP / Mode
 
 `AgentGate` sits between your agent (Claude Code, Cursor, Windsurf, or any MCP client) and a tool server, enforcing policy, evaluating semantic danger via an LLM judge, redacting secrets, rate-limiting, and auditing every single call — before it ever touches your system.
 
-```
-┌──────────┐   tools/call   ┌────────────────────────────────────────────────────────┐   tools/call   ┌──────────────┐
-│  Agent   │ ─────────────► │                       AgentGate                        │ ─────────────► │ Tool server  │
-│ (client) │ ◄───────────── │                                                        │ ◄───────────── │  (child)     │
-└──────────┘    response    │ • Tier 0: Deny-by-default rules, regex & rate-limit    │    response    └──────────────┘
-                            │ • Tier 1: Claude Haiku semantic risk classifier        │
-                            │ • Router: 3-way routing (Allow / Human Approval / Deny)│
-                            │ • Secrets: Nested JSON arg & response redaction        │
-                            └───────────────────────────┬────────────────────────────┘
-                                                        ▼
-                                       audit.jsonl (JSONL, secrets stripped)
-                                                        ▼
-                                       Live SSE Dashboard (http://localhost:8700)
-```
+```mermaid
+flowchart LR
+    A(["Agent"]) -- "tools/call" --> G{{"AgentGate<br/>Tier0 → Tier1 → Router"}}
+    G -- "response" --> A
+    G -- "tools/call" --> T(["Tool server"])
+    T -- "response" --> G
+    G -.-> L[("audit.jsonl")] -.-> D["SSE Dashboard :8700"]
 
+    classDef c fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1
+    classDef g fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#e65100
+    classDef s fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#1b5e20
+    classDef p fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,color:#4a148c
+    class A c
+    class G g
+    class T s
+    class L,D p
+```
 ---
 
 ## The Problem: The "Semantic Gap"
