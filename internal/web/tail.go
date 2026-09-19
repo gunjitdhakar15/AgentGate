@@ -49,8 +49,15 @@ func (d *Dashboard) tailOnce(path string, offset int64) int64 {
 	if _, err := f.ReadAt(buf, offset); err != nil {
 		return offset
 	}
-	offset = st.Size()
-	for _, line := range bytes.Split(buf, []byte("\n")) {
+	lastNL := bytes.LastIndexByte(buf, '\n')
+	if lastNL == -1 {
+		return offset // wait for complete newline
+	}
+
+	complete := buf[:lastNL]
+	offset += int64(lastNL + 1)
+
+	for _, line := range bytes.Split(complete, []byte("\n")) {
 		if len(bytes.TrimSpace(line)) == 0 {
 			continue
 		}

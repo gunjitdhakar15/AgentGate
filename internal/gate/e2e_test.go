@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -226,8 +227,13 @@ func TestE2ESinkReceivesEvents(t *testing.T) {
 	}, nil)
 
 	g, w, r, _ := testGate(t, cp)
+	var mu sync.Mutex
 	var got []audit.Entry
-	g.Sink = func(e audit.Entry) { got = append(got, e) }
+	g.Sink = func(e audit.Entry) {
+		mu.Lock()
+		defer mu.Unlock()
+		got = append(got, e)
+	}
 
 	e2eRun(t, w, r, "tools/call", map[string]any{
 		"name": "shell", "arguments": map[string]any{"cmd": "ls"},
@@ -240,12 +246,23 @@ func TestE2ESinkReceivesEvents(t *testing.T) {
 	// The gate's deferred audit fires after the reply is written, so wait
 	// for the sink to catch up instead of racing it.
 	deadline := time.Now().Add(3 * time.Second)
-	for len(got) < 5 && time.Now().Before(deadline) {
+	for time.Now().Before(deadline) {
+		mu.Lock()
+		count := len(got)
+		mu.Unlock()
+		if count >= 5 {
+			break
+		}
 		time.Sleep(10 * time.Millisecond)
 	}
 
+	mu.Lock()
+	entries := make([]audit.Entry, len(got))
+	copy(entries, got)
+	mu.Unlock()
+
 	kinds := map[string]int{}
-	for _, e := range got {
+	for _, e := range entries {
 		kinds[e.Kind]++
 	}
 	if kinds["request"] < 2 {
