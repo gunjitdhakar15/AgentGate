@@ -347,6 +347,11 @@ func (g *Gate) RedactPayload(raw json.RawMessage) []byte {
 	return out
 }
 
+// RateAllowed reports whether the rate limit permits a call for this tool.
+func (g *Gate) RateAllowed(tool string) bool {
+	return g.rateAllowed(tool)
+}
+
 // rateAllowed enforces the policy rate limits for a tool.
 func (g *Gate) rateAllowed(tool string) bool {
 	allowed := true
