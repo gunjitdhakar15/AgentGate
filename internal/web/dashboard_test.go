@@ -86,3 +86,34 @@ func TestDashboardSlowSubscriberDropped(t *testing.T) {
 		t.Errorf("total = %d, want 300", s.Counters["total"])
 	}
 }
+
+func TestDashboardConcurrentSubscribeAndBroadcast(t *testing.T) {
+	d := New()
+	stop := make(chan struct{})
+
+	// Spin up subscriber goroutines that rapidly subscribe and unsubscribe
+	for i := 0; i < 5; i++ {
+		go func() {
+			for {
+				select {
+				case <-stop:
+					return
+				default:
+					ch, done := d.Subscribe()
+					select {
+					case <-ch:
+					case <-time.After(time.Millisecond):
+					}
+					done()
+				}
+			}
+		}()
+	}
+
+	// Spin up broadcaster sending entries concurrently
+	for i := 0; i < 200; i++ {
+		d.Notify(entry("request", "shell"))
+		time.Sleep(100 * time.Microsecond)
+	}
+	close(stop)
+}
