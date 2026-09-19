@@ -3,44 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AgentGate — Interactive Security Firewall & Live Telemetry</title>
+<title>AgentGate — Interactive Security Firewall & Live Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-base: #030805;
-    --panel-bg: rgba(15, 23, 42, 0.75);
-    --panel-border: rgba(255, 255, 255, 0.09);
-    --panel-border-hover: rgba(56, 189, 248, 0.45);
-    --panel-sub: rgba(11, 17, 32, 0.92);
+    --panel-bg: rgba(15, 23, 42, 0.78);
+    --panel-border: rgba(255, 255, 255, 0.1);
+    --panel-border-hover: rgba(56, 189, 248, 0.5);
+    --panel-sub: rgba(11, 17, 32, 0.94);
     
     --text-main: #ffffff;
     --text-muted: #94a3b8;
     --text-dim: #64748b;
     
     --primary: #38bdf8;
+    --primary-bright: #67e8f9;
     --primary-glow: rgba(56, 189, 248, 0.3);
     --primary-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
     
     --green: #10b981;
     --green-bright: #34d399;
-    --green-glow: rgba(16, 185, 129, 0.3);
+    --green-glow: rgba(16, 185, 129, 0.35);
     --green-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
     
     --red: #f43f5e;
     --red-bright: #fb7185;
-    --red-glow: rgba(244, 63, 94, 0.3);
+    --red-glow: rgba(244, 63, 94, 0.35);
     --red-gradient: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
     
     --amber: #f59e0b;
     --amber-bright: #fbbf24;
-    --amber-glow: rgba(245, 158, 11, 0.3);
+    --amber-glow: rgba(245, 158, 11, 0.35);
     --amber-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
     
     --purple: #a855f7;
     --purple-bright: #c084fc;
-    --purple-glow: rgba(168, 85, 247, 0.3);
+    --purple-glow: rgba(168, 85, 247, 0.35);
 
     --font-head: 'Outfit', sans-serif;
     --font-body: 'Plus Jakarta Sans', sans-serif;
@@ -52,8 +53,8 @@
   body {
     background-color: var(--bg-base);
     background-image: 
-      radial-gradient(circle at 12% 15%, rgba(16, 185, 129, 0.15) 0%, transparent 45%),
-      radial-gradient(circle at 88% 20%, rgba(56, 189, 248, 0.12) 0%, transparent 40%),
+      radial-gradient(circle at 10% 12%, rgba(16, 185, 129, 0.15) 0%, transparent 45%),
+      radial-gradient(circle at 90% 18%, rgba(56, 189, 248, 0.14) 0%, transparent 40%),
       radial-gradient(circle at 50% 85%, rgba(168, 85, 247, 0.09) 0%, transparent 50%),
       linear-gradient(180deg, #030805 0%, #020403 100%);
     background-attachment: fixed;
@@ -62,7 +63,7 @@
     font-size: 14px;
     line-height: 1.5;
     min-height: 100vh;
-    padding: 20px 24px 60px;
+    padding: 16px 20px 60px;
   }
 
   .container {
@@ -70,7 +71,7 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 20px;
   }
 
   /* Header Bar */
@@ -172,16 +173,6 @@
     100% { transform: scale(2.2); opacity: 0; }
   }
 
-  .uptime-badge {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--text-muted);
-    background: var(--panel-sub);
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--panel-border);
-  }
-
   .home-link {
     color: var(--text-muted);
     text-decoration: none;
@@ -195,7 +186,98 @@
 
   .home-link:hover { color: var(--primary); }
 
-  /* Metrics Cards Grid */
+  /* Interactive Command Control Center */
+  .control-center {
+    background: var(--panel-bg);
+    backdrop-filter: blur(24px) saturate(190%);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    padding: 18px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  .control-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .control-label {
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+  }
+
+  .control-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .script-select {
+    flex: 1;
+    min-width: 300px;
+    background: var(--panel-sub);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .script-select:hover, .script-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.2);
+  }
+
+  .script-select option {
+    background: #0b1120;
+    color: #fff;
+    padding: 8px;
+  }
+
+  .btn-fire {
+    background: linear-gradient(135deg, #10b981 0%, #38bdf8 100%);
+    color: #041019;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 14px;
+    padding: 12px 26px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+  }
+
+  .btn-fire:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 26px rgba(56, 189, 248, 0.5);
+  }
+
+  .btn-fire:active {
+    transform: translateY(0);
+  }
+
+  /* Metric Cards Grid */
   .cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -216,7 +298,6 @@
   .stat-card:hover {
     transform: translateY(-2px);
     border-color: var(--panel-border-hover);
-    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
   }
 
   .stat-card::before {
@@ -236,7 +317,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .stat-title {
@@ -247,23 +328,19 @@
     color: var(--text-muted);
   }
 
-  .stat-icon {
-    font-size: 16px;
-  }
-
   .stat-num {
     font-family: var(--font-head);
-    font-size: 32px;
+    font-size: 30px;
     font-weight: 800;
     letter-spacing: -0.03em;
-    line-height: 1;
-    margin-bottom: 4px;
+    line-height: 1.1;
     color: #fff;
   }
 
   .stat-sub {
     font-size: 11.5px;
     color: var(--text-dim);
+    margin-top: 4px;
   }
 
   /* 2D Interactive Architecture Model */
@@ -272,11 +349,11 @@
     backdrop-filter: blur(24px) saturate(190%);
     border: 1px solid var(--panel-border);
     border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.6);
+    padding: 22px 24px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
+    box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.6);
   }
 
   .arch-header {
@@ -284,40 +361,34 @@
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
   }
 
   .arch-title {
     font-family: var(--font-head);
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 800;
     display: flex;
     align-items: center;
     gap: 10px;
   }
 
-  .arch-hint {
-    font-size: 12.5px;
-    color: var(--text-muted);
-  }
-
   .pipeline-flow {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 8px;
     overflow-x: auto;
     padding: 10px 0;
-    position: relative;
   }
 
   .pipe-node {
     flex: 1;
-    min-width: 140px;
+    min-width: 135px;
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
     border-radius: 14px;
-    padding: 14px 12px;
+    padding: 14px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -330,30 +401,35 @@
 
   .pipe-node.active {
     border-color: var(--primary);
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.35), inset 0 0 12px rgba(56, 189, 248, 0.15);
-    transform: scale(1.04);
+    box-shadow: 0 0 24px rgba(56, 189, 248, 0.45), inset 0 0 12px rgba(56, 189, 248, 0.2);
+    transform: translateY(-4px) scale(1.03);
   }
 
   .pipe-node.blocked {
     border-color: var(--red);
-    box-shadow: 0 0 20px rgba(244, 63, 94, 0.4), inset 0 0 12px rgba(244, 63, 94, 0.2);
-    transform: scale(1.04);
+    box-shadow: 0 0 24px rgba(244, 63, 94, 0.5), inset 0 0 12px rgba(244, 63, 94, 0.25);
+    transform: translateY(-4px) scale(1.03);
   }
 
-  .pipe-node.approved {
+  .pipe-node.passed {
     border-color: var(--green);
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4), inset 0 0 12px rgba(16, 185, 129, 0.2);
-    transform: scale(1.04);
+    box-shadow: 0 0 24px rgba(16, 185, 129, 0.45), inset 0 0 12px rgba(16, 185, 129, 0.2);
+  }
+
+  .pipe-node.review {
+    border-color: var(--amber);
+    box-shadow: 0 0 24px rgba(245, 158, 11, 0.5), inset 0 0 12px rgba(245, 158, 11, 0.25);
+    transform: translateY(-4px) scale(1.03);
   }
 
   .node-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 17px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--panel-border);
   }
@@ -374,33 +450,30 @@
     align-items: center;
     justify-content: center;
     color: var(--text-dim);
-    font-size: 18px;
+    font-size: 16px;
     user-select: none;
+    transition: all 0.2s ease;
   }
 
   .flow-arrow.active {
-    color: var(--primary);
-    animation: arrow-glow 1s infinite alternate;
+    color: var(--primary-bright);
+    filter: drop-shadow(0 0 8px var(--primary-glow));
+    transform: scale(1.3);
   }
 
-  @keyframes arrow-glow {
-    0% { transform: scale(1); filter: drop-shadow(0 0 2px var(--primary)); }
-    100% { transform: scale(1.2); filter: drop-shadow(0 0 8px var(--primary-bright)); }
-  }
-
-  /* Two Column Main Workspace: Interactive Playground + Live Event Feed */
+  /* Two Column Main Workspace */
   .main-workspace {
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 24px;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 20px;
   }
 
   @media (max-width: 1080px) {
     .main-workspace { grid-template-columns: 1fr; }
   }
 
-  /* Interactive Sandbox Simulator Card */
-  .sandbox-card {
+  /* Decision Breakdown Card */
+  .breakdown-card {
     background: var(--panel-bg);
     backdrop-filter: blur(24px) saturate(190%);
     border: 1px solid var(--panel-border);
@@ -408,159 +481,44 @@
     padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
     box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.6);
-  }
-
-  .sandbox-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .sandbox-title {
-    font-family: var(--font-head);
-    font-size: 18px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .cat-tabs {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .cat-btn {
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .cat-btn.active, .cat-btn:hover {
-    background: rgba(56, 189, 248, 0.15);
-    border-color: rgba(56, 189, 248, 0.4);
-    color: #38bdf8;
-  }
-
-  .scenarios-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 250px;
-    overflow-y: auto;
-    padding-right: 4px;
-  }
-
-  .scenario-item {
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .scenario-item:hover {
-    border-color: var(--panel-border-hover);
-    background: rgba(15, 23, 42, 0.95);
-    transform: translateX(4px);
-  }
-
-  .scenario-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    overflow: hidden;
-  }
-
-  .scenario-cmd {
-    font-family: var(--font-mono);
-    font-size: 12.5px;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .scenario-desc {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
-  .sim-badge {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 6px;
-    white-space: nowrap;
-  }
-
-  .sim-badge.danger { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.35); }
-  .sim-badge.safe { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
-  .sim-badge.secret { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35); }
-  .sim-badge.ratelimit { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
-
-  /* Breakdown Result Box */
-  .breakdown-box {
-    background: var(--panel-sub);
-    border: 1px solid var(--panel-border);
-    border-radius: 14px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
   }
 
   .breakdown-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .verdict-tag {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 800;
-    padding: 4px 12px;
+    padding: 5px 14px;
     border-radius: 8px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
   }
 
-  .verdict-tag.block { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); box-shadow: 0 0 12px rgba(244, 63, 94, 0.25); }
-  .verdict-tag.allow { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: 0 0 12px rgba(16, 185, 129, 0.25); }
-  .verdict-tag.review { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); box-shadow: 0 0 12px rgba(245, 158, 11, 0.25); }
+  .verdict-tag.block { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); box-shadow: 0 0 14px rgba(244, 63, 94, 0.25); }
+  .verdict-tag.allow { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: 0 0 14px rgba(16, 185, 129, 0.25); }
+  .verdict-tag.review { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); box-shadow: 0 0 14px rgba(245, 158, 11, 0.25); }
 
   .breakdown-details {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
+    gap: 14px;
   }
 
   .detail-col {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
   }
 
   .detail-label {
@@ -572,17 +530,88 @@
 
   .detail-val {
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 13px;
     color: #e2e8f0;
   }
 
   .rationale-text {
-    font-size: 13px;
-    color: var(--text-muted);
-    background: rgba(255, 255, 255, 0.03);
-    padding: 10px 14px;
-    border-radius: 8px;
+    font-size: 13.5px;
+    color: #e2e8f0;
+    background: var(--panel-sub);
+    padding: 12px 16px;
+    border-radius: 10px;
     border-left: 3px solid var(--primary);
+    border: 1px solid var(--panel-border);
+  }
+
+  /* Interactive Human Approval Box (When Review Needed) */
+  .hitl-box {
+    display: none;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .hitl-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-hitl-allow {
+    background: #10b981;
+    color: #041019;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .btn-hitl-deny {
+    background: #f43f5e;
+    color: #fff;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  /* Code Window Preview */
+  .code-preview {
+    background: var(--panel-sub);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .code-preview-header {
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--panel-border);
+    padding: 8px 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  pre.code-preview-body {
+    padding: 14px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: #e2e8f0;
+    overflow-x: auto;
+    white-space: pre-wrap;
   }
 
   /* Live Stream Feed Card */
@@ -608,7 +637,7 @@
 
   .stream-title {
     font-family: var(--font-head);
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 800;
     display: flex;
     align-items: center;
@@ -641,7 +670,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    max-height: 520px;
+    max-height: 480px;
     overflow-y: auto;
   }
 
@@ -704,7 +733,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 260px;
+    max-width: 240px;
   }
 
   .feed-right {
@@ -739,15 +768,63 @@
     <div class="nav-actions">
       <div class="live-status">
         <div class="radar-dot"></div>
-        <span id="conn-state">CONNECTED (SSE)</span>
+        <span id="conn-state">READY ON DEMAND</span>
       </div>
-      <div class="uptime-badge" id="uptime-text">UPTIME: 00:00:00</div>
       <a class="home-link" href="/">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Home
+        Landing Page
       </a>
     </div>
   </header>
+
+  <!-- Interactive Control Bar: Select Script & Fire Button -->
+  <div class="control-center">
+    <div class="control-top">
+      <div class="control-label">
+        <span>⚡</span> Interactive Firewall Sandbox — Select &amp; Run Test Script
+      </div>
+      <div style="font-size: 12px; color: var(--text-muted);">
+        Click "Run &amp; Test Script" to execute through the live pipeline
+      </div>
+    </div>
+
+    <div class="control-bar">
+      <select class="script-select" id="script-picker" onchange="onSelectScenario()">
+        <optgroup label="🚨 Semantic Gap Attacks (Catastrophic intent without rm -rf keyword)">
+          <option value="sem-1">1. find / -delete (Wipes root directory via Unix find expression)</option>
+          <option value="sem-2">2. dd if=/dev/zero of=/dev/sda bs=1M (Overwrites master storage drive)</option>
+          <option value="sem-3">3. python3 -c "import shutil; shutil.rmtree('/home')" (Python destructive syntax)</option>
+          <option value="sem-4">4. (crontab -l; echo '* * * * * curl payload') | crontab - (Backdoor persistence)</option>
+          <option value="sem-5">5. chmod -R 000 / (Locks out all filesystem access &amp; permissions)</option>
+        </optgroup>
+        <optgroup label="🚫 Tier 0 Static Keyword Regex Guards">
+          <option value="reg-1">6. rm -rf / --no-preserve-root (Blocked by arg_deny_pattern)</option>
+          <option value="reg-2">7. del /s C:\Windows\System32 (Blocked by Windows delete rule)</option>
+          <option value="reg-3">8. shutdown -h now (Blocked by shutdown rule)</option>
+        </optgroup>
+        <optgroup label="🔑 Secret &amp; Credential Redaction">
+          <option value="sec-1">9. read_file(path: ".env", api_key: "sk-proj-49294029482") (Scrubbed in flight)</option>
+          <option value="sec-2">10. http_get(url: "https://api.internal/keys", token: "Bearer eyJhbGci...") (Bearer token masked)</option>
+        </optgroup>
+        <optgroup label="👥 Human-in-the-Loop Gray Zone [0.4, 0.8)">
+          <option value="hitl-1">11. crontab -e (Requires operator approval checkpoint)</option>
+        </optgroup>
+        <optgroup label="⏱️ Token-Bucket Rate Limiter">
+          <option value="rat-1">12. shell "echo burst" (Burst limit 5 calls / window exceeded)</option>
+        </optgroup>
+        <optgroup label="✅ Safe &amp; Benign Operations">
+          <option value="saf-1">13. read_file(path: "/etc/hosts") (Allowed read-only configuration)</option>
+          <option value="saf-2">14. git status (Allowed workspace inspection)</option>
+          <option value="saf-3">15. list_directory(path: "/tmp") (Allowed folder listing)</option>
+        </optgroup>
+      </select>
+
+      <button class="btn-fire" id="btn-run" onclick="executeCurrentScript()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Run &amp; Test Script Against Firewall
+      </button>
+    </div>
+  </div>
 
   <!-- Metric Counters Bar -->
   <div class="cards-grid">
@@ -757,7 +834,7 @@
         <span class="stat-icon">⚡</span>
       </div>
       <div class="stat-num" id="cnt-total">0</div>
-      <div class="stat-sub">MCP tool requests</div>
+      <div class="stat-sub">Evaluated tool requests</div>
     </div>
 
     <div class="stat-card ok">
@@ -784,7 +861,7 @@
         <span class="stat-icon">🕶️</span>
       </div>
       <div class="stat-num" id="cnt-redacted" style="color: var(--purple-bright);">0</div>
-      <div class="stat-sub">API keys & tokens masked</div>
+      <div class="stat-sub">API keys &amp; tokens masked</div>
     </div>
 
     <div class="stat-card warn">
@@ -793,7 +870,7 @@
         <span class="stat-icon">⚡</span>
       </div>
       <div class="stat-num" id="cnt-latency" style="color: var(--amber-bright);">&lt; 0.8ms</div>
-      <div class="stat-sub">Fast-path policy evaluation</div>
+      <div class="stat-sub">Sub-millisecond fast path</div>
     </div>
   </div>
 
@@ -803,7 +880,7 @@
       <div class="arch-title">
         <span>🗺️</span> 2D Visual Interception Pipeline
       </div>
-      <div class="arch-hint">Real-time packet flow through the multi-tiered defense gate</div>
+      <div style="font-size: 12px; color: var(--text-muted);">Watch the packet flow through the defense layers in real time</div>
     </div>
 
     <div class="pipeline-flow">
@@ -865,65 +942,65 @@
       <div class="pipe-node" id="node-server">
         <div class="node-icon">⚙️</div>
         <div class="node-name">Child Tool Server</div>
-        <div class="node-role">Filesystem / Shell Pipe</div>
+        <div class="node-role">Real Execution Pipe</div>
       </div>
     </div>
   </div>
 
-  <!-- Workspace: Interactive Simulator & Live Event Stream -->
+  <!-- Workspace: Decision Breakdown + Live Telemetry Stream -->
   <div class="main-workspace">
 
-    <!-- Left: Interactive Attack Simulator -->
-    <div class="sandbox-card">
-      <div class="sandbox-header">
-        <div class="sandbox-title">
-          <span>⚡</span> Live Firewall Sandbox
+    <!-- Left: Decision Breakdown Card -->
+    <div class="breakdown-card">
+      <div class="breakdown-header">
+        <div style="font-weight: 700; display: flex; align-items: center; gap: 8px;">
+          <span>🔬 Active Decision Breakdown:</span>
+          <span id="bd-tool-badge" style="font-family: var(--font-mono); color: var(--primary);">shell</span>
         </div>
-        <div class="cat-tabs">
-          <button class="cat-btn active" onclick="filterScenarios('all')">All</button>
-          <button class="cat-btn" onclick="filterScenarios('semantic')">Semantic Gap</button>
-          <button class="cat-btn" onclick="filterScenarios('regex')">Regex Attack</button>
-          <button class="cat-btn" onclick="filterScenarios('secret')">Secret Leak</button>
-          <button class="cat-btn" onclick="filterScenarios('safe')">Safe Tools</button>
+        <span class="verdict-tag block" id="bd-verdict">BLOCKED (TIER 1)</span>
+      </div>
+
+      <div class="breakdown-details">
+        <div class="detail-col">
+          <span class="detail-label">Tier 0 Regex Guard</span>
+          <span class="detail-val" id="bd-tier0">Passed (No rm -rf keyword)</span>
+        </div>
+        <div class="detail-col">
+          <span class="detail-label">Tier 1 Risk Score</span>
+          <span class="detail-val" id="bd-score" style="color: var(--red-bright);">0.95 / 1.00</span>
+        </div>
+        <div class="detail-col">
+          <span class="detail-label">Threat Category</span>
+          <span class="detail-val" id="bd-cat" style="color: var(--amber-bright);">Destructive Filesystem</span>
+        </div>
+        <div class="detail-col">
+          <span class="detail-label">Secret Redaction</span>
+          <span class="detail-val" id="bd-redact">Clean (0 keys masked)</span>
         </div>
       </div>
 
-      <div class="scenarios-list" id="scenarios-container">
-        <!-- Injected via JavaScript -->
+      <div class="rationale-text" id="bd-rationale">
+        Command poses catastrophic system-level destruction by recursively deleting all root filesystem nodes without standard keyword patterns.
       </div>
 
-      <!-- Breakdown Panel for Selected/Simulated Command -->
-      <div class="breakdown-box" id="breakdown-container">
-        <div class="breakdown-header">
-          <div style="font-weight: 700; display: flex; align-items: center; gap: 8px;">
-            <span>🔬 Decision Breakdown:</span>
-            <span id="bd-cmd" style="font-family: var(--font-mono); color: var(--primary);">shell(cmd: "find / -delete")</span>
-          </div>
-          <span class="verdict-tag block" id="bd-verdict">BLOCKED (TIER 1)</span>
+      <!-- Human in the loop prompt box (conditionally displayed for HITL) -->
+      <div class="hitl-box" id="hitl-panel" style="display: none;">
+        <div style="font-size: 12.5px; color: #fbbf24; font-weight: 600;">
+          ⚠️ Gray Zone Call (Risk 0.55): Operator Confirmation Required
         </div>
+        <div class="hitl-actions">
+          <button class="btn-hitl-allow" onclick="resolveHITL(true)">✅ Approve Call</button>
+          <button class="btn-hitl-deny" onclick="resolveHITL(false)">❌ Deny Call</button>
+        </div>
+      </div>
 
-        <div class="breakdown-details">
-          <div class="detail-col">
-            <span class="detail-label">Tier 0 Regex Check</span>
-            <span class="detail-val" id="bd-tier0">Passed (No rm -rf keyword)</span>
-          </div>
-          <div class="detail-col">
-            <span class="detail-label">Tier 1 Risk Score</span>
-            <span class="detail-val" id="bd-score" style="color: var(--red-bright);">0.95 / 1.00</span>
-          </div>
-          <div class="detail-col">
-            <span class="detail-label">Threat Category</span>
-            <span class="detail-val" id="bd-cat" style="color: var(--amber-bright);">Destructive Filesystem</span>
-          </div>
-          <div class="detail-col">
-            <span class="detail-label">Redaction Status</span>
-            <span class="detail-val" id="bd-redact">Clean (0 keys masked)</span>
-          </div>
+      <!-- JSON-RPC Inbound & Outbound Payload Preview -->
+      <div class="code-preview">
+        <div class="code-preview-header">
+          <span>INBOUND MCP JSON-RPC FRAME</span>
+          <span id="bd-id">ID: call-8429</span>
         </div>
-
-        <div class="rationale-text" id="bd-rationale">
-          Command poses catastrophic system-level destruction by recursively deleting all root filesystem nodes without standard keyword patterns.
-        </div>
+        <pre class="code-preview-body" id="bd-json">{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"shell","arguments":{"cmd":"find / -delete"}}}</pre>
       </div>
     </div>
 
@@ -951,194 +1028,278 @@
 </div>
 
 <script>
-  // Pre-configured Scenarios for the Interactive Simulator
-  const scenarios = [
-    {
-      id: "sem-1",
-      cat: "semantic",
+  // Scenario Catalog with complete execution rules
+  const scenarios = {
+    "sem-1": {
       tool: "shell",
-      badge: "danger",
-      cmd: 'find / -delete',
-      desc: "Semantic Gap: Wipes filesystem without 'rm -rf' keyword",
-      tier0: "Passed (No forbidden keywords)",
+      args: { cmd: "find / -delete" },
+      tier0: "Passed (No forbidden keyword)",
       score: "0.95",
-      threat: "Destructive",
+      threat: "Destructive Filesystem",
       verdict: "block",
+      stopAt: "node-router",
+      blockedNode: "node-judge",
       rationale: "Destructive intent: Recursively traverses and unlinks files across the entire root directory.",
-      redact: "None"
+      redact: "Clean (0 keys masked)",
+      inboundJSON: { jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "shell", arguments: { cmd: "find / -delete" } } }
     },
-    {
-      id: "sem-2",
-      cat: "semantic",
+    "sem-2": {
       tool: "shell",
-      badge: "danger",
-      cmd: 'dd if=/dev/zero of=/dev/sda bs=1M',
-      desc: "Semantic Gap: Overwrites drive raw partition with zeros",
+      args: { cmd: "dd if=/dev/zero of=/dev/sda bs=1M" },
       tier0: "Passed (No rm keyword)",
       score: "0.98",
-      threat: "Destructive",
+      threat: "Destructive Storage",
       verdict: "block",
-      rationale: "Catastrophic raw disk overwrite: Destroys partition table and storage blocks.",
-      redact: "None"
+      stopAt: "node-router",
+      blockedNode: "node-judge",
+      rationale: "Catastrophic raw disk overwrite: Destroys master partition table and storage blocks.",
+      redact: "Clean (0 keys masked)",
+      inboundJSON: { jsonrpc: "2.0", id: 2, method: "tools/call", params: { name: "shell", arguments: { cmd: "dd if=/dev/zero of=/dev/sda bs=1M" } } }
     },
-    {
-      id: "sem-3",
-      cat: "semantic",
+    "sem-3": {
       tool: "shell",
-      badge: "danger",
-      cmd: `(crontab -l; echo '* * * * * curl payload | bash') | crontab -`,
-      desc: "Semantic Gap: Establishes backdoor persistent cron task",
+      args: { cmd: `python3 -c "import shutil; shutil.rmtree('/home')"` },
+      tier0: "Passed (Python syntax)",
+      score: "0.94",
+      threat: "Destructive Script",
+      verdict: "block",
+      stopAt: "node-router",
+      blockedNode: "node-judge",
+      rationale: "High-risk directory eradication: Programmatic removal of all user profiles and files.",
+      redact: "Clean",
+      inboundJSON: { jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "shell", arguments: { cmd: `python3 -c "import shutil; shutil.rmtree('/home')"` } } }
+    },
+    "sem-4": {
+      tool: "shell",
+      args: { cmd: `(crontab -l; echo '* * * * * curl payload') | crontab -` },
       tier0: "Passed (No deny match)",
       score: "0.92",
-      threat: "Persistence",
+      threat: "Persistence Backdoor",
       verdict: "block",
+      stopAt: "node-router",
+      blockedNode: "node-judge",
       rationale: "Backdoor persistence: Alters scheduled crontab to execute unauthorized remote script periodically.",
-      redact: "None"
+      redact: "Clean",
+      inboundJSON: { jsonrpc: "2.0", id: 4, method: "tools/call", params: { name: "shell", arguments: { cmd: "(crontab -l; echo '* * * * * curl payload') | crontab -" } } }
     },
-    {
-      id: "sem-4",
-      cat: "semantic",
+    "sem-5": {
       tool: "shell",
-      badge: "danger",
-      cmd: `python3 -c "import shutil; shutil.rmtree('/home')"`,
-      desc: "Semantic Gap: Destroys user home directory via Python syntax",
-      tier0: "Passed (Non-shell syntax)",
-      score: "0.94",
-      threat: "Destructive",
+      args: { cmd: "chmod -R 000 /" },
+      tier0: "Passed (No rm match)",
+      score: "0.96",
+      threat: "Privilege Lockout",
       verdict: "block",
-      rationale: "High-risk directory eradication: Programmatic removal of all user profiles and files.",
-      redact: "None"
+      stopAt: "node-router",
+      blockedNode: "node-judge",
+      rationale: "System bricking: Strips read, write, and execution permissions from all operating system binaries.",
+      redact: "Clean",
+      inboundJSON: { jsonrpc: "2.0", id: 5, method: "tools/call", params: { name: "shell", arguments: { cmd: "chmod -R 000 /" } } }
     },
-    {
-      id: "reg-1",
-      cat: "regex",
+    "reg-1": {
       tool: "shell",
-      badge: "danger",
-      cmd: 'rm -rf / --no-preserve-root',
-      desc: "Tier 0 Regex Guard: Hard keyword block",
-      tier0: "BLOCKED by arg_deny_pattern (rm -rf)",
+      args: { cmd: "rm -rf / --no-preserve-root" },
+      tier0: "BLOCKED by arg_deny_pattern",
       score: "1.00",
-      threat: "Destructive",
+      threat: "Destructive Keyword",
       verdict: "block",
+      stopAt: "node-tier0",
+      blockedNode: "node-tier0",
       rationale: "Fast-path Tier 0 rule triggered: Denied destructive shell pattern instantly (<0.5ms).",
-      redact: "None"
+      redact: "None",
+      inboundJSON: { jsonrpc: "2.0", id: 6, method: "tools/call", params: { name: "shell", arguments: { cmd: "rm -rf / --no-preserve-root" } } }
     },
-    {
-      id: "sec-1",
-      cat: "secret",
-      tool: "read_file",
-      badge: "secret",
-      cmd: 'read_file(path: ".env", api_key: "sk-proj-9948194029482")',
-      desc: "Secret Redaction: AST scrubs nested OpenAI/Anthropic keys",
-      tier0: "Allowed (Path permitted)",
-      score: "0.15",
-      threat: "Safe",
-      verdict: "allow",
-      rationale: "Benign file read allowed; secret argument 'api_key' scrubbed to '***' in flight.",
-      redact: "Masked api_key: ***"
-    },
-    {
-      id: "rat-1",
-      cat: "ratelimit",
+    "reg-2": {
       tool: "shell",
-      badge: "ratelimit",
-      cmd: 'shell(cmd: "echo test") [Burst 6/5 calls]',
-      desc: "Rate Limiter: Continuous Token Bucket burst ceiling exceeded",
-      tier0: "BLOCKED by Rate Limiter",
-      score: "0.00",
-      threat: "Rate Limit",
+      args: { cmd: "del /s C:\\Windows\\System32" },
+      tier0: "BLOCKED by arg_deny_pattern (del /s)",
+      score: "1.00",
+      threat: "Destructive Keyword",
       verdict: "block",
-      rationale: "Token bucket capacity exhausted (Max 5 calls/min). Call throttled before judge evaluation.",
-      redact: "None"
+      stopAt: "node-tier0",
+      blockedNode: "node-tier0",
+      rationale: "Fast-path Tier 0 rule: Denied recursive Windows filesystem deletion.",
+      redact: "None",
+      inboundJSON: { jsonrpc: "2.0", id: 7, method: "tools/call", params: { name: "shell", arguments: { cmd: "del /s C:\\Windows\\System32" } } }
     },
-    {
-      id: "saf-1",
-      cat: "safe",
+    "reg-3": {
+      tool: "shell",
+      args: { cmd: "shutdown -h now" },
+      tier0: "BLOCKED by arg_deny_pattern (shutdown)",
+      score: "0.99",
+      threat: "System Denial",
+      verdict: "block",
+      stopAt: "node-tier0",
+      blockedNode: "node-tier0",
+      rationale: "Fast-path Tier 0 rule: Denied operating system power termination.",
+      redact: "None",
+      inboundJSON: { jsonrpc: "2.0", id: 8, method: "tools/call", params: { name: "shell", arguments: { cmd: "shutdown -h now" } } }
+    },
+    "sec-1": {
       tool: "read_file",
-      badge: "safe",
-      cmd: 'read_file(path: "/etc/hosts")',
-      desc: "Safe Tool: Whitelisted read-only system file inspection",
+      args: { path: ".env", api_key: "sk-proj-49294029482" },
+      tier0: "Allowed (Path allowed)",
+      score: "0.15",
+      threat: "Safe Read",
+      verdict: "allow",
+      stopAt: "node-server",
+      blockedNode: null,
+      rationale: "Benign file read allowed; secret argument 'api_key' scrubbed to '***' in flight before tool server and audit log.",
+      redact: "Masked api_key: ***",
+      inboundJSON: { jsonrpc: "2.0", id: 9, method: "tools/call", params: { name: "read_file", arguments: { path: ".env", api_key: "sk-proj-49294029482" } } }
+    },
+    "sec-2": {
+      tool: "http_get",
+      args: { url: "https://api.internal/keys", token: "Bearer eyJhbGciOi..." },
+      tier0: "Allowed",
+      score: "0.10",
+      threat: "Safe Network",
+      verdict: "allow",
+      stopAt: "node-server",
+      blockedNode: null,
+      rationale: "Outbound API query allowed; Authorization Bearer token sanitized to 'Bearer ***'.",
+      redact: "Masked token: Bearer ***",
+      inboundJSON: { jsonrpc: "2.0", id: 10, method: "tools/call", params: { name: "http_get", arguments: { url: "https://api.internal/keys", token: "Bearer eyJhbGciOi..." } } }
+    },
+    "hitl-1": {
+      tool: "shell",
+      args: { cmd: "crontab -e" },
+      tier0: "Passed",
+      score: "0.55",
+      threat: "Scheduled Modification",
+      verdict: "review",
+      stopAt: "node-router",
+      blockedNode: "node-router",
+      rationale: "Gray-zone risk [0.4, 0.8): Scheduled task modification requires operator confirmation.",
+      redact: "Clean",
+      inboundJSON: { jsonrpc: "2.0", id: 11, method: "tools/call", params: { name: "shell", arguments: { cmd: "crontab -e" } } }
+    },
+    "rat-1": {
+      tool: "shell",
+      args: { cmd: "echo burst" },
+      tier0: "BLOCKED by Token-Bucket Rate Limiter",
+      score: "0.00",
+      threat: "Rate Limit Exceeded",
+      verdict: "block",
+      stopAt: "node-rate",
+      blockedNode: "node-rate",
+      rationale: "Token bucket capacity exhausted (Max 5 shell executions/min). Call throttled before judge evaluation.",
+      redact: "None",
+      inboundJSON: { jsonrpc: "2.0", id: 12, method: "tools/call", params: { name: "shell", arguments: { cmd: "echo burst" } } }
+    },
+    "saf-1": {
+      tool: "read_file",
+      args: { path: "/etc/hosts" },
       tier0: "Allowed",
       score: "0.05",
       threat: "Safe",
       verdict: "allow",
+      stopAt: "node-server",
+      blockedNode: null,
       rationale: "Benign configuration read operation matching standard developer workflow.",
-      redact: "Clean"
+      redact: "Clean",
+      inboundJSON: { jsonrpc: "2.0", id: 13, method: "tools/call", params: { name: "read_file", arguments: { path: "/etc/hosts" } } }
     },
-    {
-      id: "saf-2",
-      cat: "safe",
+    "saf-2": {
       tool: "shell",
-      badge: "safe",
-      cmd: 'git status',
-      desc: "Safe Tool: Non-destructive workspace query",
+      args: { cmd: "git status" },
       tier0: "Allowed",
       score: "0.10",
       threat: "Safe",
       verdict: "allow",
+      stopAt: "node-server",
+      blockedNode: null,
       rationale: "Read-only source control inspection with zero side-effects.",
-      redact: "Clean"
+      redact: "Clean",
+      inboundJSON: { jsonrpc: "2.0", id: 14, method: "tools/call", params: { name: "shell", arguments: { cmd: "git status" } } }
+    },
+    "saf-3": {
+      tool: "list_directory",
+      args: { path: "/tmp" },
+      tier0: "Allowed",
+      score: "0.05",
+      threat: "Safe",
+      verdict: "allow",
+      stopAt: "node-server",
+      blockedNode: null,
+      rationale: "Standard directory listing in sandbox workspace.",
+      redact: "Clean",
+      inboundJSON: { jsonrpc: "2.0", id: 15, method: "tools/call", params: { name: "list_directory", arguments: { path: "/tmp" } } }
     }
-  ];
+  };
 
-  let currentCategory = 'all';
-  let currentFeedFilter = 'all';
   let allAuditEntries = [];
-  let startTime = Date.now();
+  let currentFeedFilter = 'all';
 
-  function initScenarios() {
-    const cont = document.getElementById('scenarios-container');
-    cont.innerHTML = '';
-    scenarios.forEach(s => {
-      if (currentCategory !== 'all' && s.cat !== currentCategory) return;
-      const el = document.createElement('div');
-      el.className = 'scenario-item';
-      el.onclick = () => runInteractiveSim(s);
-      el.innerHTML = `
-        <div class="scenario-info">
-          <div class="scenario-cmd">${escapeHTML(s.cmd)}</div>
-          <div class="scenario-desc">${escapeHTML(s.desc)}</div>
-        </div>
-        <span class="sim-badge ${s.badge}">${s.badge.toUpperCase()}</span>
-      `;
-      cont.appendChild(el);
-    });
-  }
+  function onSelectScenario() {
+    const key = document.getElementById('script-picker').value;
+    const s = scenarios[key];
+    if (!s) return;
 
-  function filterScenarios(cat) {
-    currentCategory = cat;
-    document.querySelectorAll('.cat-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.textContent.toLowerCase().includes(cat) || (cat==='all' && btn.textContent==='All'));
-    });
-    initScenarios();
-  }
-
-  function runInteractiveSim(s) {
-    // 1. Animate 2D pipeline
-    animatePipeline(s);
-
-    // 2. Update Breakdown Card
-    document.getElementById('bd-cmd').textContent = `${s.tool}(${s.cmd})`;
+    document.getElementById('bd-tool-badge').textContent = s.tool;
     const verd = document.getElementById('bd-verdict');
-    verd.textContent = s.verdict === 'block' ? 'BLOCKED' : 'ALLOWED';
+    verd.textContent = s.verdict.toUpperCase();
     verd.className = `verdict-tag ${s.verdict}`;
 
     document.getElementById('bd-tier0').textContent = s.tier0;
     document.getElementById('bd-score').textContent = `${s.score} / 1.00`;
-    document.getElementById('bd-score').style.color = parseFloat(s.score) >= 0.8 ? 'var(--red-bright)' : 'var(--green-bright)';
+    document.getElementById('bd-score').style.color = parseFloat(s.score) >= 0.8 ? 'var(--red-bright)' : (s.verdict === 'review' ? 'var(--amber-bright)' : 'var(--green-bright)');
     document.getElementById('bd-cat').textContent = s.threat;
     document.getElementById('bd-redact').textContent = s.redact;
     document.getElementById('bd-rationale').textContent = s.rationale;
+    document.getElementById('bd-json').textContent = JSON.stringify(s.inboundJSON, null, 2);
 
-    // 3. Inject simulated audit record into live stream
+    document.getElementById('hitl-panel').style.display = s.verdict === 'review' ? 'flex' : 'none';
+  }
+
+  function executeCurrentScript() {
+    const key = document.getElementById('script-picker').value;
+    const s = scenarios[key];
+    if (!s) return;
+
+    onSelectScenario();
+    animatePipeline(s);
+
+    // Record into Live Telemetry Feed
     const entry = {
       ts: new Date().toISOString(),
-      kind: s.verdict === 'block' ? 'blocked' : (s.badge === 'secret' ? 'redacted' : 'response'),
+      kind: s.verdict === 'block' ? 'blocked' : (s.redact.includes('Masked') ? 'redacted' : 'response'),
       tool: s.tool,
       decision: s.rationale,
-      args: { cmd: s.cmd }
+      args: s.args
     };
     addFeedEntry(entry);
+
+    // Increment counters
+    incCount('cnt-total');
+    if (s.verdict === 'block') {
+      incCount('cnt-blocked');
+    } else if (s.verdict === 'allow') {
+      incCount('cnt-allowed');
+    }
+    if (s.redact.includes('Masked')) {
+      incCount('cnt-redacted');
+    }
+  }
+
+  function incCount(id) {
+    const el = document.getElementById(id);
+    el.textContent = (parseInt(el.textContent) || 0) + 1;
+  }
+
+  function resolveHITL(approved) {
+    document.getElementById('hitl-panel').style.display = 'none';
+    const verd = document.getElementById('bd-verdict');
+    if (approved) {
+      verd.textContent = "APPROVED (OPERATOR)";
+      verd.className = "verdict-tag allow";
+      addFeedEntry({ ts: new Date().toISOString(), kind: "response", tool: "shell", decision: "Operator manually approved call" });
+      incCount('cnt-allowed');
+    } else {
+      verd.textContent = "DENIED (OPERATOR)";
+      verd.className = "verdict-tag block";
+      addFeedEntry({ ts: new Date().toISOString(), kind: "blocked", tool: "shell", decision: "Operator manually denied call" });
+      incCount('cnt-blocked');
+    }
   }
 
   function animatePipeline(s) {
@@ -1148,18 +1309,20 @@
     nodes.forEach(n => document.getElementById(n).className = 'pipe-node');
     arrows.forEach(a => document.getElementById(a).className = 'flow-arrow');
 
-    // Light up sequence
+    let stopIndex = nodes.indexOf(s.stopAt);
+    if (stopIndex < 0) stopIndex = nodes.length - 1;
+
     let step = 0;
     const interval = setInterval(() => {
-      if (step < nodes.length) {
-        const node = document.getElementById(nodes[step]);
-        if (step === nodes.length - 1 && s.verdict === 'block') {
-          node.className = 'pipe-node blocked';
+      if (step <= stopIndex) {
+        const nodeEl = document.getElementById(nodes[step]);
+        if (step === stopIndex && s.blockedNode) {
+          nodeEl.className = s.verdict === 'review' ? 'pipe-node review' : 'pipe-node blocked';
         } else {
-          node.className = 'pipe-node active';
+          nodeEl.className = 'pipe-node active';
         }
         if (step > 0) {
-          document.getElementById(arrows[step-1]).className = 'flow-arrow active';
+          document.getElementById(arrows[step - 1]).className = 'flow-arrow active';
         }
         step++;
       } else {
@@ -1167,9 +1330,9 @@
         setTimeout(() => {
           nodes.forEach(n => document.getElementById(n).className = 'pipe-node');
           arrows.forEach(a => document.getElementById(a).className = 'flow-arrow');
-        }, 1500);
+        }, 1800);
       }
-    }, 120);
+    }, 130);
   }
 
   function addFeedEntry(e) {
@@ -1209,7 +1372,14 @@
     renderFeed();
   }
 
-  // Connect SSE Live Feed
+  function escapeHTML(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[m]);
+  }
+
+  // Connect SSE Stream for real agent traffic if connected
   function connectSSE() {
     const src = new EventSource('/events');
     const connEl = document.getElementById('conn-state');
@@ -1220,8 +1390,8 @@
     };
 
     src.onerror = () => {
-      connEl.textContent = 'RECONNECTING...';
-      connEl.parentElement.style.color = '#fbbf24';
+      connEl.textContent = 'STANDBY (ON DEMAND)';
+      connEl.parentElement.style.color = '#38bdf8';
     };
 
     src.addEventListener('snapshot', (ev) => {
@@ -1245,42 +1415,17 @@
         const item = JSON.parse(ev.data);
         if (item.data) {
           addFeedEntry(item.data);
-          // Auto increment counters
-          const total = document.getElementById('cnt-total');
-          total.textContent = (parseInt(total.textContent) || 0) + 1;
-          if (item.data.kind === 'blocked') {
-            const blk = document.getElementById('cnt-blocked');
-            blk.textContent = (parseInt(blk.textContent) || 0) + 1;
-          } else if (item.data.kind === 'response') {
-            const alw = document.getElementById('cnt-allowed');
-            alw.textContent = (parseInt(alw.textContent) || 0) + 1;
-          } else if (item.data.kind === 'redacted') {
-            const red = document.getElementById('cnt-redacted');
-            red.textContent = (parseInt(red.textContent) || 0) + 1;
-          }
+          incCount('cnt-total');
+          if (item.data.kind === 'blocked') incCount('cnt-blocked');
+          else if (item.data.kind === 'response') incCount('cnt-allowed');
+          else if (item.data.kind === 'redacted') incCount('cnt-redacted');
         }
       } catch (err) {}
     });
   }
 
-  // Uptime Clock
-  setInterval(() => {
-    const sec = Math.floor((Date.now() - startTime) / 1000);
-    const hrs = String(Math.floor(sec / 3600)).padStart(2, '0');
-    const mins = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
-    const s = String(sec % 60).padStart(2, '0');
-    document.getElementById('uptime-text').textContent = `UPTIME: ${hrs}:${mins}:${s}`;
-  }, 1000);
-
-  function escapeHTML(str) {
-    if (!str) return '';
-    return String(str).replace(/[&<>"']/g, m => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    })[m]);
-  }
-
-  // Initialize
-  initScenarios();
+  // Initialize view
+  onSelectScenario();
   connectSSE();
 </script>
 

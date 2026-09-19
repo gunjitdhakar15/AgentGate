@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"sync/atomic"
 	"time"
 
@@ -36,10 +35,9 @@ var demoScenarios = []demoScenario{
 	{tool: "shell", args: map[string]any{"cmd": "curl http://192.168.1.1/admin"}, allowed: false, decision: "blocked by policy rule"},
 }
 
-// StartDemoTraffic feeds realistic audit entries into the dashboard so the
-// hosted demo shows live firewall activity without a real agent attached.
+// StartDemoTraffic initializes the dashboard state in standby mode so
+// the operator can manually trigger scripts from the interactive control center.
 func StartDemoTraffic(ctx context.Context, dash *web.Dashboard) {
-	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 	var id atomic.Int64
 	emit := func(eventID int64, e audit.Entry) {
 		e.RequestID = fmt.Sprintf("demo-%d", eventID)
@@ -47,50 +45,18 @@ func StartDemoTraffic(ctx context.Context, dash *web.Dashboard) {
 	}
 
 	go func() {
-		settle := time.NewTimer(900 * time.Millisecond)
+		settle := time.NewTimer(500 * time.Millisecond)
 		select {
 		case <-ctx.Done():
 			return
 		case <-settle.C:
 		}
-		emit(id.Add(1), audit.Entry{TS: time.Now(), Kind: "request", Method: "initialize", Duration: 12 * time.Millisecond})
-
-		ticker := time.NewTicker(1600 * time.Millisecond)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				s := demoScenarios[rnd.Intn(len(demoScenarios))]
-				now := time.Now()
-				emit(id.Add(1), audit.Entry{
-					TS: now, Kind: "request", Method: "tools/call",
-					Duration: time.Duration(rnd.Intn(50)+5) * time.Millisecond,
-				})
-				time.Sleep(time.Duration(rnd.Intn(120)+40) * time.Millisecond)
-
-				args := cloneArgs(s.args)
-				if s.allowed {
-					if s.redactKey != "" && args[s.redactKey] != nil {
-						args[s.redactKey] = "***"
-						emit(id.Add(1), audit.Entry{
-							TS: time.Now(), Kind: "redacted", Method: "tools/call",
-							Tool: s.tool, Decision: "arguments", Args: mustJSON(args),
-						})
-					}
-					emit(id.Add(1), audit.Entry{
-						TS: time.Now(), Kind: "response", Method: "tools/call",
-						Tool: s.tool, Result: demoResult(s.tool, args),
-					})
-				} else {
-					emit(id.Add(1), audit.Entry{
-						TS: time.Now(), Kind: "blocked", Method: "tools/call",
-						Tool: s.tool, Decision: s.decision, Args: mustJSON(args),
-					})
-				}
-			}
-		}
+		emit(id.Add(1), audit.Entry{
+			TS:       time.Now(),
+			Kind:     "request",
+			Method:   "initialize",
+			Duration: 10 * time.Millisecond,
+		})
 	}()
 }
 
