@@ -145,10 +145,10 @@ func TestE2EBlockedAndRedacted(t *testing.T) {
 
 	_, w, r, store := testGate(t, cp)
 
-	// Blocked call: shell is denied.
+	// Blocked call: shell is denied, but sensitive argument must still be redacted.
 	data := e2eRun(t, w, r, "tools/call", map[string]any{
 		"name":      "shell",
-		"arguments": map[string]any{"cmd": "ls"},
+		"arguments": map[string]any{"cmd": "ls", "api_key": "sk-secret-blocked"},
 	})
 	var resp mcp.Response
 	if err := json.Unmarshal(data, &resp); err != nil {
@@ -191,6 +191,9 @@ func TestE2EBlockedAndRedacted(t *testing.T) {
 	}
 	if string(blocked[0].Args) == "" {
 		t.Fatal("blocked entry should record the redacted args")
+	}
+	if contains(string(blocked[0].Args), "sk-secret-blocked") {
+		t.Fatalf("secret leaked in audit log for blocked call: %s", blocked[0].Args)
 	}
 }
 

@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"context"
@@ -35,28 +35,93 @@ var demoScenarios = []demoScenario{
 	{tool: "shell", args: map[string]any{"cmd": "curl http://192.168.1.1/admin"}, allowed: false, decision: "blocked by policy rule"},
 }
 
-// StartDemoTraffic initializes the dashboard state in standby mode so
-// the operator can manually trigger scripts from the interactive control center.
+// StartDemoTraffic streams synthetic MCP traffic through the firewall dashboard.
 func StartDemoTraffic(ctx context.Context, dash *web.Dashboard) {
 	var id atomic.Int64
-	emit := func(eventID int64, e audit.Entry) {
-		e.RequestID = fmt.Sprintf("demo-%d", eventID)
+	emit := func(e audit.Entry) {
+		e.RequestID = fmt.Sprintf("demo-%d", id.Add(1))
 		dash.Notify(e)
 	}
 
 	go func() {
-		settle := time.NewTimer(500 * time.Millisecond)
-		select {
-		case <-ctx.Done():
-			return
-		case <-settle.C:
-		}
-		emit(id.Add(1), audit.Entry{
+		// Emit initial session event
+		emit(audit.Entry{
 			TS:       time.Now(),
 			Kind:     "request",
 			Method:   "initialize",
 			Duration: 10 * time.Millisecond,
 		})
+
+		ticker := time.NewTicker(2 * time.Second)
+		defer ticker.Stop()
+
+		idx := 0
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				sc := demoScenarios[idx%len(demoScenarios)]
+				idx++
+
+				redactedArgs := cloneArgs(sc.args)
+				if sc.redactKey != "" {
+					redactedArgs[sc.redactKey] = "***"
+				}
+
+				redJSON := mustJSON(redactedArgs)
+
+				// 1. Request entry
+				emit(audit.Entry{
+					TS:       time.Now(),
+					Kind:     "request",
+					Method:   "tools/call",
+					Tool:     sc.tool,
+					Args:     redJSON,
+					Duration: 2 * time.Millisecond,
+				})
+
+				// 2. Decision entry
+				if !sc.allowed {
+					emit(audit.Entry{
+						TS:       time.Now(),
+						Kind:     "blocked",
+						Method:   "tools/call",
+						Tool:     sc.tool,
+						Args:     redJSON,
+						Decision: sc.decision,
+						Duration: 15 * time.Millisecond,
+					})
+				} else if sc.redactKey != "" {
+					emit(audit.Entry{
+						TS:       time.Now(),
+						Kind:     "redacted",
+						Method:   "tools/call",
+						Tool:     sc.tool,
+						Args:     redJSON,
+						Decision: "arguments",
+						Duration: 8 * time.Millisecond,
+					})
+					emit(audit.Entry{
+						TS:       time.Now(),
+						Kind:     "response",
+						Method:   "tools/call",
+						Tool:     sc.tool,
+						Result:   demoResult(sc.tool, redactedArgs),
+						Duration: 25 * time.Millisecond,
+					})
+				} else {
+					emit(audit.Entry{
+						TS:       time.Now(),
+						Kind:     "response",
+						Method:   "tools/call",
+						Tool:     sc.tool,
+						Result:   demoResult(sc.tool, redactedArgs),
+						Duration: 22 * time.Millisecond,
+					})
+				}
+			}
+		}
 	}()
 }
 

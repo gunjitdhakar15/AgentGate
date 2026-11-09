@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strings"
 )
 
 // Approver is the human-in-the-loop checkpoint required before a
-// RouteNeedsApproval call proceeds. This satisfies the hackathon's ground
-// rule that consequential actions get a qualified human reviewer before
+// RouteNeedsApproval call proceeds. This satisfies the requirement
+// that consequential actions get a qualified human reviewer before
 // execution — the interface is deliberately small so a real deployment can
 // swap the CLI prompt below for a Slack approval, a web dashboard button,
 // or anything else, without touching the routing logic in router.go.
@@ -25,13 +26,26 @@ type Approver interface {
 
 // CLIApprover prompts the operator for approval. It writes prompts to
 // os.Stderr (never os.Stdout, which is reserved for the agent's MCP JSON-RPC stream)
-// and reads response from the configured input reader.
+// and reads input from the controlling console device (CONIN$ on Windows, /dev/tty on Unix)
+// so that it never consumes frames from the agent's stdio stream.
 type CLIApprover struct {
-	in  *bufio.Reader
-	out io.Writer
+	in     *bufio.Reader
+	out    io.Writer
+	closer io.Closer
+}
+
+func openTTY() (io.ReadCloser, error) {
+	if runtime.GOOS == "windows" {
+		return os.OpenFile("CONIN$", os.O_RDWR, 0)
+	}
+	return os.OpenFile("/dev/tty", os.O_RDONLY, 0)
 }
 
 func NewCLIApprover() *CLIApprover {
+	tty, err := openTTY()
+	if err == nil {
+		return &CLIApprover{in: bufio.NewReader(tty), out: os.Stderr, closer: tty}
+	}
 	return NewCustomCLIApprover(os.Stdin, os.Stderr)
 }
 
@@ -43,6 +57,14 @@ func NewCustomCLIApprover(in io.Reader, out io.Writer) *CLIApprover {
 		out = os.Stderr
 	}
 	return &CLIApprover{in: bufio.NewReader(in), out: out}
+}
+
+// Close closes the underlying console handle if opened.
+func (a *CLIApprover) Close() error {
+	if a.closer != nil {
+		return a.closer.Close()
+	}
+	return nil
 }
 
 func (a *CLIApprover) RequestApproval(ctx context.Context, tc ToolCallContext, v Verdict) (bool, error) {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -35,9 +36,12 @@ type Gate struct {
 	// call Tier 0 (Policy) allowed. Nil means Tier 0 only — this makes it
 	// possible to run the eval harness against both configurations from
 	// the same binary by simply not constructing a Judge.
-	Judge      judge.Judge
-	RouterCfg  judge.RouterConfig
-	Approver   judge.Approver
+	Judge     judge.Judge
+	RouterCfg judge.RouterConfig
+	Approver  judge.Approver
+	// JudgeTimeout bounds a single Tier 1 assessment. 0 disables the extra
+	// deadline (the provider's own HTTP timeout still applies).
+	JudgeTimeout time.Duration
 	// TaskContext is passed to the judge as the agent's stated goal, if
 	// the operator has one to give (e.g. set from the session's initial
 	// prompt). Optional.
@@ -46,6 +50,16 @@ type Gate struct {
 	log     *log.Logger
 	buckets []*bucketRule
 	history []string // rolling window of recent "tool(argsSummary)" strings, this session only
+
+	// serverMsgs carries frames from the single long-lived reader that owns
+	// the tool-server stream. See Serve.
+	serverMsgs <-chan serverMessage
+}
+
+// serverMessage is one frame (or terminal error) read from the tool server.
+type serverMessage struct {
+	data []byte
+	err  error
 }
 
 type bucketRule struct {
@@ -72,6 +86,28 @@ func Compile(p Policy) (*compiledPolicy, error) { return compilePolicy(p) }
 // cancelled. The stdio transport is strictly sequential: the agent sends a
 // request and waits for the reply, so we serialize everything in one loop.
 func (g *Gate) Serve(ctx context.Context, agent, server *mcp.Stream) error {
+	// Exactly one goroutine owns reads from the tool server for the lifetime
+	// of the session. Reading per-request leaks a goroutine when a request
+	// times out, and that leaked reader can then steal the reply belonging to
+	// the next request. A single reader feeds a channel instead; replies are
+	// matched to the request ID below.
+	msgs := make(chan serverMessage, 32)
+	g.serverMsgs = msgs
+	go func() {
+		for {
+			data, err := server.Read()
+			select {
+			case msgs <- serverMessage{data: data, err: err}:
+			case <-ctx.Done():
+				return
+			}
+			if err != nil {
+				close(msgs)
+				return
+			}
+		}
+	}()
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -183,7 +219,7 @@ func (g *Gate) handleRequest(ctx context.Context, req *mcp.Request, raw []byte, 
 	}
 
 	// Read the single reply for this request.
-	resp, err := g.readReply(ctx, server)
+	resp, err := g.readReply(ctx, agent, req.ID)
 	if err != nil {
 		return err
 	}
@@ -213,7 +249,13 @@ func (g *Gate) handleRequest(ctx context.Context, req *mcp.Request, raw []byte, 
 // request; err is non-nil only for a transport-level failure while
 // responding.
 func (g *Gate) runJudge(ctx context.Context, req *mcp.Request, agent *mcp.Stream, tool string, args map[string]any) (blocked bool, err error) {
-	verdict, jerr := g.Judge.Assess(ctx, judge.ToolCallContext{
+	assessCtx := ctx
+	if g.JudgeTimeout > 0 {
+		var cancel context.CancelFunc
+		assessCtx, cancel = context.WithTimeout(ctx, g.JudgeTimeout)
+		defer cancel()
+	}
+	verdict, jerr := g.Judge.Assess(assessCtx, judge.ToolCallContext{
 		Tool: tool, Arguments: args, TaskContext: g.TaskContext, RecentHistory: g.history,
 	})
 
@@ -284,15 +326,18 @@ func (g *Gate) forwardRelay(ctx context.Context, req *mcp.Request, raw []byte, a
 	if err := server.WriteRaw(raw); err != nil {
 		return fmt.Errorf("forward %s: %w", req.Method, err)
 	}
-	resp, err := g.readReply(ctx, server)
+	resp, err := g.readReply(ctx, agent, req.ID)
 	if err != nil {
 		return err
 	}
 	return agent.Write(resp)
 }
 
-// readReply reads exactly one response message from the tool server.
-func (g *Gate) readReply(ctx context.Context, server *mcp.Stream) (*mcp.Response, error) {
+// readReply reads the response for expectedID from the tool server, relaying
+// any intermediate notifications back to the agent. Replies whose id does not
+// match are stale (e.g. a late answer to a request that already timed out)
+// and are dropped rather than handed to the wrong caller.
+func (g *Gate) readReply(ctx context.Context, agent *mcp.Stream, expectedID json.RawMessage) (*mcp.Response, error) {
 	timeout := g.Timeout
 	if timeout <= 0 {
 		timeout = 10 * time.Minute
@@ -300,36 +345,50 @@ func (g *Gate) readReply(ctx context.Context, server *mcp.Stream) (*mcp.Response
 	timer := time.NewTimer(timeout)
 	defer timer.Stop()
 
-	type replyResult struct {
-		resp *mcp.Response
-		err  error
+	for {
+		select {
+		case msg, ok := <-g.serverMsgs:
+			if !ok {
+				return nil, io.EOF
+			}
+			if msg.err != nil {
+				return nil, fmt.Errorf("read reply: %w", msg.err)
+			}
+			if mcp.ObjectKind(msg.data) == mcp.KindNotification {
+				// Relay tool server notification (e.g. progress, logs) to the agent.
+				if agent != nil {
+					_ = agent.WriteRaw(msg.data)
+				}
+				continue
+			}
+			resp, err := mcp.ParseResponse(msg.data)
+			if err != nil {
+				return nil, err
+			}
+			if !sameJSONID(resp.ID, expectedID) {
+				g.log.Printf("dropping stale response id=%s expected=%s", string(resp.ID), string(expectedID))
+				continue
+			}
+			return resp, nil
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-timer.C:
+			return nil, fmt.Errorf("timed out waiting for tool server reply (%v)", timeout)
+		}
 	}
-	done := make(chan replyResult, 1)
-	go func() {
-		data, err := server.Read()
-		if err != nil {
-			done <- replyResult{err: err}
-			return
-		}
-		resp, err := mcp.ParseResponse(data)
-		if err != nil {
-			done <- replyResult{err: err}
-			return
-		}
-		done <- replyResult{resp: resp}
-	}()
+}
 
-	select {
-	case res := <-done:
-		if res.err != nil {
-			return nil, fmt.Errorf("read reply: %w", res.err)
-		}
-		return res.resp, nil
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	case <-timer.C:
-		return nil, fmt.Errorf("timed out waiting for tool server reply (%v)", timeout)
+// sameJSONID compares two JSON-RPC ids, tolerating formatting differences
+// between numeric and string encodings.
+func sameJSONID(a, b json.RawMessage) bool {
+	if len(a) == 0 || len(b) == 0 {
+		return false
 	}
+	var av, bv any
+	if json.Unmarshal(a, &av) != nil || json.Unmarshal(b, &bv) != nil {
+		return string(a) == string(b)
+	}
+	return fmt.Sprintf("%v", av) == fmt.Sprintf("%v", bv)
 }
 
 // RedactPayload masks redaction patterns in string values of a JSON payload.
@@ -416,6 +475,7 @@ func parseToolCall(req *mcp.Request) (ToolCall, error) {
 // returns its stdio stream. The returned cleanup waits for process exit.
 func SpawnToolServer(ctx context.Context, bin string, args []string) (*mcp.Stream, func(), error) {
 	cmd := exec.CommandContext(ctx, bin, args...)
+	cmd.Stderr = os.Stderr
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, nil, fmt.Errorf("stdin pipe: %w", err)

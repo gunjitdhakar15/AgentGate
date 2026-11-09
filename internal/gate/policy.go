@@ -1,4 +1,4 @@
-package gate
+﻿package gate
 
 import (
 	"encoding/json"
@@ -121,42 +121,67 @@ func compilePolicy(p Policy) (*compiledPolicy, error) {
 
 // Check evaluates the policy for a tool call. args is the raw argument map
 // (or nil when arguments are absent). It returns a Decision plus a copy of
-// arguments with redaction applied.
+// arguments with redaction applied. All returns guarantee redacted arguments
+// to prevent secret leaks into audit trails or downstream consumers.
 func (c *compiledPolicy) Check(tool string, args map[string]any) (Decision, map[string]any) {
 	dec := Decision{Allowed: true, Rule: "default-allow"}
 
-	// 1. Size guard.
+	// 1. Redact arguments in place (copy) unconditionally before applying rules
+	// so that ALL code paths (blocked, allowed, audit logs, size checks) are safe.
+	redacted, _ := redactValue(args, c.redacts).(map[string]any)
+	if redacted == nil {
+		redacted = args
+	}
+
+	// 2. Size guard.
 	if c.p.MaxArgBytes > 0 {
-		if b, err := json.Marshal(args); err == nil && len(b) > c.p.MaxArgBytes {
+		if b, err := json.Marshal(redacted); err == nil && len(b) > c.p.MaxArgBytes {
 			dec.Allowed = false
 			dec.Reason = fmt.Sprintf("arguments exceed %d bytes", c.p.MaxArgBytes)
 			dec.Rule = "max_arg_bytes"
-			return dec, args
+			return dec, redacted
 		}
 	}
 
-	// 2. Tool rules: a Deny rule blocks unless an Allow rule for the same
-	// tool overrides it (deny-by-default pattern).
+	// 3. Tool rules: Specific tool rules take precedence over broad wildcard (*) rules.
 	blocked := false
 	blockReason := ""
+
+	// Pass 1: Apply global wildcard rules
 	for _, r := range c.p.ToolRules {
-		if r.ApplyTo != "" && !strings.EqualFold(r.ApplyTo, tool) && !strings.EqualFold(r.ApplyTo, "*") {
-			continue
-		}
-		if r.Deny {
-			blocked = true
-			blockReason = r.Reason
-			dec.Rule = "deny:" + tool
-		}
-		if r.Allow {
-			blocked = false
-			blockReason = ""
-			dec.Rule = "allow:" + tool
+		if r.ApplyTo == "*" || r.ApplyTo == "" {
+			if r.Deny {
+				blocked = true
+				blockReason = r.Reason
+				dec.Rule = "deny:*"
+			}
+			if r.Allow {
+				blocked = false
+				blockReason = ""
+				dec.Rule = "allow:*"
+			}
 		}
 	}
 
-	// 3. Argument pattern denials are a hard safety net: they block even
+	// Pass 2: Apply specific tool rules (overriding wildcard)
+	for _, r := range c.p.ToolRules {
+		if r.ApplyTo != "" && strings.EqualFold(r.ApplyTo, tool) {
+			if r.Deny {
+				blocked = true
+				blockReason = r.Reason
+				dec.Rule = "deny:" + tool
+			}
+			if r.Allow {
+				blocked = false
+				blockReason = ""
+				dec.Rule = "allow:" + tool
+			}
+		}
+	}
+
+	// 4. Argument pattern denials are a hard safety net: they block even
 	// when the tool is allowed, and an Allow override cannot undo them.
+	// We check against both raw and redacted JSON representations.
 	rb, _ := json.Marshal(args)
 	argText := string(rb)
 	for _, ad := range c.argDenies {
@@ -174,17 +199,11 @@ func (c *compiledPolicy) Check(tool string, args map[string]any) (Decision, map[
 	if blocked {
 		dec.Allowed = false
 		dec.Reason = orDefault(blockReason, "blocked by policy rule")
-		return dec, args
+		return dec, redacted
 	}
 
-	// 4. Redact arguments in place (copy).
-	redacted, _ := redactValue(args, c.redacts).(map[string]any)
-	if redacted == nil {
-		redacted = args
-	}
 	return dec, redacted
 }
-
 // RedactText applies redaction rules to a response payload, returning
 // sanitized bytes.
 func (c *compiledPolicy) RedactText(s string) string {

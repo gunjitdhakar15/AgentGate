@@ -31,7 +31,7 @@ policy:
       allow: true
     - apply_to: shell
       allow: true
-      arg_deny_pattern: "(rm -rf|del /s|shutdown|format |:(){:|:&};:)"
+      arg_deny_pattern: "(rm -rf|del /s|shutdown|format |:(){ :|:& };:|:(){:|:&};:)"
       reason: "dangerous shell commands blocked"
     - apply_to: write_file
       deny: true
@@ -59,3 +59,16 @@ policy:
 
   # Reject tool calls with oversized argument payloads.
   max_arg_bytes: 65536
+
+# Tier 1 Semantic Judge (optional).
+# Leave provider empty to run Tier 0 only. Flags override these values.
+judge:
+  provider: ""            # anthropic | openai | gemini | ollama | mock | "" (disabled)
+  model: ""               # e.g. claude-haiku-4-5-20251001, gpt-4o-mini, gemini-2.5-flash, llama3.2
+  api_url: ""             # custom endpoint (OpenAI-compatible or Ollama, e.g. http://localhost:11434)
+  block_threshold: 0.8    # >= this is auto-blocked
+  review_threshold: 0.4   # >= this (and < block) needs human approval
+  fail_open: true         # read tools fail open on judge error; high_risk_tools always fail closed
+  high_risk_tools: ["shell", "write_file"]
+  timeout: 10s            # per-assessment deadline
+  approval: auto          # auto | cli | web | deny  (auto = web with --serve, else cli)

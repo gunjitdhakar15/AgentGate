@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gunjitdhakar15/AgentGate/internal/audit"
+	"github.com/gunjitdhakar15/AgentGate/internal/judge"
 )
 
 const maxRecent = 200
@@ -41,6 +42,7 @@ type Dashboard struct {
 	tools    map[string]*toolStats
 	recent   []audit.Entry
 	subs     map[chan event]struct{}
+	Approver *judge.WebApprover
 }
 
 // New creates an empty dashboard.
@@ -120,6 +122,24 @@ func (d *Dashboard) Subscribe() (<-chan event, func()) {
 		d.mu.Lock()
 		delete(d.subs, ch)
 		d.mu.Unlock()
+	}
+}
+
+// Broadcast sends an event of any type (e.g. approval_required) to all live subscribers.
+func (d *Dashboard) Broadcast(eventType string, data any) {
+	ev := event{Type: eventType, Data: data}
+	d.mu.RLock()
+	chans := make([]chan event, 0, len(d.subs))
+	for ch := range d.subs {
+		chans = append(chans, ch)
+	}
+	d.mu.RUnlock()
+
+	for _, ch := range chans {
+		select {
+		case ch <- ev:
+		default:
+		}
 	}
 }
 

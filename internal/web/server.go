@@ -56,8 +56,62 @@ func (d *Dashboard) Handler() http.Handler {
 	mux.HandleFunc("/dashboard", d.handleDashboard)
 	mux.HandleFunc("/api/stats", d.handleStats)
 	mux.HandleFunc("/api/evaluate", d.handleEvaluate)
+	mux.HandleFunc("/api/hitl/approve", d.handleHITLApprove)
+	mux.HandleFunc("/api/hitl/deny", d.handleHITLDeny)
+	mux.HandleFunc("/api/hitl/pending", d.handleHITLPending)
 	mux.HandleFunc("/events", d.handleSSE)
 	return mux
+}
+
+type HITLActionRequest struct {
+	ID string `json:"id"`
+}
+
+func (d *Dashboard) handleHITLApprove(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var req HITLActionRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid json payload", http.StatusBadRequest)
+		return
+	}
+	if d.Approver == nil {
+		http.Error(w, "no HITL approver configured", http.StatusBadRequest)
+		return
+	}
+	ok := d.Approver.Resolve(req.ID, true)
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]any{"resolved": ok, "verdict": "APPROVED"})
+}
+
+func (d *Dashboard) handleHITLDeny(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var req HITLActionRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid json payload", http.StatusBadRequest)
+		return
+	}
+	if d.Approver == nil {
+		http.Error(w, "no HITL approver configured", http.StatusBadRequest)
+		return
+	}
+	ok := d.Approver.Resolve(req.ID, false)
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]any{"resolved": ok, "verdict": "DENIED"})
+}
+
+func (d *Dashboard) handleHITLPending(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if d.Approver == nil {
+		_ = json.NewEncoder(w).Encode([]any{})
+		return
+	}
+	_ = json.NewEncoder(w).Encode(d.Approver.Pending())
 }
 
 func (d *Dashboard) handleLanding(w http.ResponseWriter, r *http.Request) {
